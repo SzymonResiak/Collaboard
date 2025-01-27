@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
@@ -97,3 +98,43 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+=======
+# Collaboard
+Organize teams into collaborative groups, manage tasks across kanban boards, and track progress seamlessly—all in one unified workspace.
+
+---
+
+## Overview  
+**Collaboard** is a collaborative productivity app designed to simplify teamwork through structured **Groups**, **Boards**, and **Tasks**. Built for flexibility, it empowers teams to manage workflows, track progress, and stay aligned—all in one intuitive space.  
+
+---
+
+## Key Features  
+
+### 🧑🤝🧑 **Groups**  
+- Create **groups** for teams, projects, or departments.  
+- Invite members with roles: **Creator**, **Admin**, or **Contributor**.  
+- Every group starts with at least one member (the creator).  
+
+### 📋 **Boards**  
+- Design **kanban-style boards** within groups (*To-Do, In Progress, Done*).  
+- Each board belongs to **group** for focused collaboration.  
+
+### ✅ **Tasks**  
+- Break work into **tasks** with descriptions, checklists, attachments, and comments.  
+- Drag-and-drop tasks across boards for seamless progress tracking.  
+- **Assignees** can update tasks, while **creators** (group/board admins) retain editing rights.
+
+---
+
+- 🎯 **Hierarchical Structure**: Groups → Boards → Tasks for clarity and scalability.  
+- 👑 **Admin Control**: Group/board creators can edit any task, even unassigned ones.  
+- ✏️ **Assignee Flexibility**: Task assignees update their work directly.
+
+---
+
+## Example Workflow  
+1. **Marketing Team** (Group) → **Q4 Campaign** (Board) → Tasks: *Design Ads, Write Copy, Launch Social*.  
+2. **Dev Team** (Group) → **Sprint #5** (Board) → Tasks: *Fix Bug #123, Deploy API, Test UI*.  
+
+>>>>>>> 777e7737117f26620dd9da7cb67b7a64e05c18ef
