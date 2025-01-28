@@ -75,4 +75,8 @@ export class BoardClass {
   getType(): BoardType {
     return this.type;
   }
+
+  getCreatedBy(): string {
+    return this.createdBy;
+  }
 }

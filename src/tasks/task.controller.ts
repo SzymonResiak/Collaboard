@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TaskCreateDto } from './dto/create-task.dto';
-import { OutputTaskDto } from './dto/output-task.dto';
+import { TaskOutputDto } from './dto/output-task.dto';
 import { Serialize } from '../common/interceptors/serialize.interceptor';
 import { EventCoordinatorService } from '../events/event-coordinator.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -32,7 +32,7 @@ export class TaskController {
 
   @Version('1')
   @Post()
-  @Serialize(OutputTaskDto)
+  @Serialize(TaskOutputDto)
   async createTask(
     @Body() createTaskDto: TaskCreateDto,
     @CurrentUser() user: UserClass,
@@ -47,7 +47,7 @@ export class TaskController {
 
   @Version('1')
   @Get('all')
-  @Serialize(OutputTaskDto)
+  @Serialize(TaskOutputDto)
   async getAllTasks() {
     const tasks = await this.eventCoordinatorService.getAllTasks();
     return tasks;
@@ -55,7 +55,7 @@ export class TaskController {
 
   @Version('1')
   @Get(':id')
-  @Serialize(OutputTaskDto)
+  @Serialize(TaskOutputDto)
   async getTaskById(@Param('id') id: string) {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('INVALID_TASK_ID');
@@ -69,21 +69,22 @@ export class TaskController {
 
   @Version('1')
   @Get()
-  @Serialize(OutputTaskDto)
-  async getTaskByOptions(
-    @Query('ids') ids: string[],
-    @Query('group') group: string,
-    @Query('table') table: string,
+  @Serialize(TaskOutputDto)
+  async getTasksByOptions(
+    @Body('ids') ids: string[],
+    @Body('group') group: string,
+    @Body('table') table: string,
   ) {
     const options = { ids, group, table };
     const tasks = await this.eventCoordinatorService.getTasksByOptions(options);
+    if (!tasks) throw new Error('TASK_NOT_FOUND');
 
     return tasks;
   }
 
   @Version('1')
   @Patch(':id')
-  @Serialize(OutputTaskDto)
+  @Serialize(TaskOutputDto)
   async updateTask(
     @Param('id') id: string,
     @Body() taskDto: TaskUpdateDto,

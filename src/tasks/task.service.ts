@@ -132,7 +132,7 @@ export class TaskService {
   async getTasksByOptions(options: {
     ids: string[];
     group: string;
-    table: string;
+    board: string;
   }): Promise<TaskClass[]> {
     const filter = this.createTaskFilter(options);
     return this.getTaskListByFilter(filter);
@@ -149,13 +149,13 @@ export class TaskService {
   private createTaskFilter(options: {
     ids: string[];
     group: string;
-    table: string;
+    board: string;
   }): any {
     const filter: any = {};
 
     if (options.ids) filter._id = { $in: options.ids };
     if (options.group) filter.group = options.group;
-    if (options.table) filter.table = options.table;
+    if (options.board) filter.table = options.board;
 
     return filter;
   }

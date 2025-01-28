@@ -6,6 +6,7 @@ import { UserUpdateDto } from 'src/users/dto/update-user.dto';
 import { UserCreateDto } from 'src/users/dto/create-user.dto';
 import { TaskClass } from 'src/tasks/task.class';
 import { TaskUpdateDto } from 'src/tasks/dto/update-task.dto';
+import { BoardClass } from '../boards/boards.class';
 
 @Injectable()
 export class EventCoordinatorService {
@@ -122,5 +123,44 @@ export class EventCoordinatorService {
 
   async deleteUser(data: any): Promise<any> {
     // return this.addEvent(USER_EVENTS.DELETE, data); // not implemented yet
+  }
+
+  // BOARD
+  async createBoard(data: any): Promise<BoardClass> {
+    const result = (
+      await this.eventEmitter.emitAsync(Event.BOARD_CREATE, data)
+    )[0];
+    return result;
+  }
+
+  async updateBoard(data: any): Promise<BoardClass> {
+    const result = (
+      await this.eventEmitter.emitAsync(Event.BOARD_UPDATE, data)
+    )[0];
+    return result;
+  }
+
+  async getBoardById(id: string): Promise<BoardClass> {
+    const result = (
+      await this.eventEmitter.emitAsync(Event.BOARD_GET_BY_ID, id)
+    )[0];
+    return result;
+  }
+
+  async getBoardByOptions(options: {
+    ids: string[];
+    group: string;
+  }): Promise<BoardClass[]> {
+    const result = (
+      await this.eventEmitter.emitAsync(
+        Event.BOARD_GET_LIST_BY_OPTIONS,
+        options,
+      )
+    )[0];
+    return result;
+  }
+
+  async deleteBoard(data: any): Promise<any> {
+    // return;
   }
 }

@@ -23,7 +23,8 @@ export const BOARD_CREATE = 'board.createBoard';
 export const BOARD_UPDATE = 'board.updateBoard';
 export const BOARD_GET_ALL = 'board.getAllBoards';
 export const BOARD_GET_BY_ID = 'board.getBoardById';
-export const BOARD_GET_LIST_BY_OPTIONS = 'board.getBoardsByIds';
+export const BOARD_GET_LIST_BY_IDS = 'board.getBoardsByIds';
+export const BOARD_GET_LIST_BY_OPTIONS = 'board.getBoardsByOptions';
 export const BOARD_DELETE = 'board.deleteBoard';
 
 // GROUP
@@ -31,5 +32,6 @@ export const GROUP_CREATE = 'group.createGroup';
 export const GROUP_UPDATE = 'group.updateGroup';
 export const GROUP_GET_ALL = 'group.getAllGroups';
 export const GROUP_GET_BY_ID = 'group.getGroupById';
+export const GROUP_GET_LIST_BY_IDS = 'group.getGroupsByIds';
 export const GROUP_GET_BY_OPTIONS = 'group.getGroupsByOptions';
 export const GROUP_DELETE = 'group.deleteGroup';

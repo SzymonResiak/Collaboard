@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class OutputTaskDto {
+export class TaskOutputDto {
   @Expose()
   id: string;
 

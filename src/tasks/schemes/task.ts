@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { TaskStatus } from '../enums/task-status.enum';
 
-@Schema({ timestamps: true }) // Automatically adds `createdAt` and `updatedAt`
+@Schema({ timestamps: true })
 export class Task extends Document {
   @Prop({ required: true, trim: true })
   title: string;
