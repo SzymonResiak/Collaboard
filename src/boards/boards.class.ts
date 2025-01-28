@@ -1,13 +1,13 @@
 import { Model, Types } from 'mongoose';
-import { TaskType } from 'src/tasks/enums/task-type.enum';
 import { Board } from './schemes/board';
+import { BoardType } from './enums/board-type.enum';
 
 export class BoardClass {
   readonly id: string;
 
   private name: string;
   private description: string;
-  private type: TaskType;
+  private type: BoardType;
 
   private admins: string[];
   private group: string;
@@ -39,7 +39,7 @@ export class BoardClass {
   isValid() {
     if (!this.name || !this.createdBy) return false;
     if (!Array.isArray(this.admins)) return false;
-    if (!Object.values(TaskType).includes(this.type)) return false;
+    if (!Object.values(BoardType).includes(this.type)) return false;
 
     return true;
   }
@@ -72,7 +72,7 @@ export class BoardClass {
     return this.group;
   }
 
-  getType(): TaskType {
+  getType(): BoardType {
     return this.type;
   }
 }
