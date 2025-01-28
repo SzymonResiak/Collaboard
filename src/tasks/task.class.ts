@@ -8,11 +8,11 @@ export class TaskClass {
   private title: string;
   private description: string;
   private status: TaskStatus;
-  private createdBy: string;
-
   private assignees: string[];
   private dueDate?: Date;
+
   private completedAt?: Date;
+  private createdBy: string;
 
   constructor(obj: any) {
     if (!obj || typeof obj !== 'object') return;
@@ -66,10 +66,8 @@ export class TaskClass {
     if (this.description) schema.description = this.description;
     if (this.status) schema.status = this.status;
     if (this.createdBy) schema.createdBy = new Types.ObjectId(this.createdBy);
-    if (this.assignees)
-      schema.assignees = [...this.assignees].map(
-        (item) => new Types.ObjectId(item),
-      );
+    const assignees = Array.from(new Set([...this.assignees]));
+    schema.assignees = assignees.map((item: any) => new Types.ObjectId(item));
     if (this.dueDate) schema.dueDate = this.dueDate;
     if (this.completedAt) schema.completedAt = this.completedAt;
 

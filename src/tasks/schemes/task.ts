@@ -26,5 +26,4 @@ export class Task extends Document {
   completedAt?: Date;
 }
 
-export type TaskDocument = Task & Document;
 export const TaskSchema = SchemaFactory.createForClass(Task);

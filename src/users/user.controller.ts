@@ -23,7 +23,7 @@ import { Types } from 'mongoose';
 import { UserUpdateDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
-import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserClass } from './user.class';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 

@@ -17,7 +17,7 @@ import { EventCoordinatorService } from '../events/event-coordinator.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { UserClass } from 'src/users/user.class';
-import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
