@@ -27,6 +27,11 @@ export class TaskCreateDto {
   assignees: string[];
 
   @IsNotEmpty()
+  @IsString()
+  @ApiProperty()
+  board: string;
+
+  @IsNotEmpty()
   @IsDateString()
   @ApiProperty()
   dueDate: Date;

@@ -22,6 +22,9 @@ export class Task extends Document {
   @Prop()
   dueDate?: Date;
 
+  @Prop({ type: Types.ObjectId, ref: 'Board', index: true })
+  board: Types.ObjectId;
+
   @Prop()
   completedAt?: Date;
 }

@@ -9,7 +9,8 @@ export class TaskClass {
   private description: string;
   private status: TaskStatus;
   private assignees: string[];
-  private dueDate?: Date;
+  private dueDate: Date;
+  private board: string;
 
   private completedAt?: Date;
   private createdBy: string;
@@ -34,11 +35,12 @@ export class TaskClass {
     if (doc.createdBy) this.createdBy = doc.createdBy;
     if (doc.assignees) this.assignees = [...doc.assignees];
     if (doc.dueDate) this.dueDate = new Date(doc.dueDate);
+    if (doc.board) this.board = doc.board;
     if (doc.completedAt) this.completedAt = new Date(doc.completedAt);
   }
 
   isValid(): boolean {
-    if (!this.title || !this.createdBy) return false;
+    if (!this.title || !this.createdBy || !this.board) return false;
     if (!Array.isArray(this.assignees)) return false;
     if (!Object.values(TaskStatus).includes(this.status)) return false;
     if (this.dueDate && !isDateValid(this.dueDate)) return false;
@@ -69,6 +71,7 @@ export class TaskClass {
     const assignees = Array.from(new Set([...this.assignees]));
     schema.assignees = assignees.map((item: any) => new Types.ObjectId(item));
     if (this.dueDate) schema.dueDate = this.dueDate;
+    if (this.board) schema.board = new Types.ObjectId(this.board);
     if (this.completedAt) schema.completedAt = this.completedAt;
 
     return schema;
@@ -84,6 +87,10 @@ export class TaskClass {
 
   getCreatedBy(): string {
     return this.createdBy;
+  }
+
+  getBoard(): string {
+    return this.board;
   }
 
   // Placeholder for methods to manipulate task properties

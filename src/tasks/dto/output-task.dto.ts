@@ -20,6 +20,9 @@ export class OutputTaskDto {
   dueDate: Date;
 
   @Expose()
+  board: string;
+
+  @Expose()
   startedAt: Date;
 
   @Expose()
