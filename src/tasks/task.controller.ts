@@ -45,13 +45,13 @@ export class TaskController {
     return result;
   }
 
-  @Version('1')
-  @Get('all')
-  @Serialize(TaskOutputDto)
-  async getAllTasks() {
-    const tasks = await this.eventCoordinatorService.getAllTasks();
-    return tasks;
-  }
+  // @Version('1')
+  // @Get('all')
+  // @Serialize(TaskOutputDto)
+  // async getAllTasks() {
+  //   const tasks = await this.eventCoordinatorService.getAllTasks();
+  //   return tasks;
+  // }
 
   @Version('1')
   @Get(':id')
@@ -73,9 +73,9 @@ export class TaskController {
   async getTasksByOptions(
     @Body('ids') ids: string[],
     @Body('group') group: string,
-    @Body('table') table: string,
+    @Body('board') board: string,
   ) {
-    const options = { ids, group, table };
+    const options = { ids, group, board };
     const tasks = await this.eventCoordinatorService.getTasksByOptions(options);
     if (!tasks) throw new Error('TASK_NOT_FOUND');
 

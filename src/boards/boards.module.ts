@@ -12,4 +12,4 @@ import { BoardService } from './boards.service';
   providers: [BoardService],
   exports: [BoardService],
 })
-export class BoardsModule {}
+export class BoardModule {}

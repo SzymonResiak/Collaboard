@@ -7,8 +7,8 @@ import {
   Version,
   Param,
   BadRequestException,
+  Patch,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
 import { EventCoordinatorService } from 'src/events/event-coordinator.service';
@@ -20,6 +20,7 @@ import { BoardOutputDto } from './dto/output-board';
 import { Types } from 'mongoose';
 import { BoardUpdateDto } from './dto/update-boards';
 import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
+import { AuthGuard } from 'src/common/guards/auth/auth.guard';
 
 @Controller('boards')
 @UseGuards(JwtAuthGuard, AuthGuard)
@@ -77,7 +78,7 @@ export class BoardController {
 
   //update board PATCH(':id')
   @Version('1')
-  @Post(':id')
+  @Patch(':id')
   @Serialize(BoardOutputDto)
   async updateBoardCtrl(
     @Param('id') id: string,

@@ -8,7 +8,6 @@ import { BoardClass } from './boards.class';
 import { Board } from './schemes/board';
 import { BoardUpdateDto } from './dto/update-boards';
 
-
 @Injectable()
 export class BoardService {
   constructor(
@@ -141,10 +140,7 @@ export class BoardService {
   // @OnEvent(Event.BOARD_DELETE, { promisify: true })
 
   //privates
-  private createBoardFilter(options: {
-    ids: string[];
-    group: string;
-  }): any {
+  private createBoardFilter(options: { ids: string[]; group: string }): any {
     const filter: any = {};
 
     if (options.ids) filter._id = { $in: options.ids };

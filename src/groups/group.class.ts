@@ -88,4 +88,8 @@ export class GroupClass {
   getBoards(): string[] {
     return [...this.boards];
   }
+
+  getCreatedBy(): string {
+    return this.createdBy;
+  }
 }

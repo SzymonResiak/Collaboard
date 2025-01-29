@@ -73,6 +73,16 @@ export class UserController {
     return user;
   }
 
+  @Version('1')
+  @Get('login/:login')
+  @Serialize(UserOutputDto)
+  async getUserByLoginCtrl(@Param('login') login: string) {
+    const user = await this.eventCoordinatorService.getUserByLogin(login);
+    if (!user) throw new NotFoundException('USER_NOT_FOUND');
+
+    return user;
+  }
+
   /*
   returns all users that are in:
   - the specified group / current user's groups
@@ -85,15 +95,13 @@ export class UserController {
   @Serialize(UserOutputDto)
   async getUsersByOptionsCtrl(
     @Query('groups') groups: string[],
-    @Query('tables') tables: string[],
-    @CurrentUser() currentUser: UserClass,
+    @CurrentUserId() currentUserId: string,
   ) {
-    const user = await this.eventCoordinatorService.getUserById(currentUser.id);
+    const user = await this.eventCoordinatorService.getUserById(currentUserId);
 
     const options = {
-      id: currentUser.id,
+      id: currentUserId,
       groups: groups ?? user.getGroups(),
-      tables: tables ?? user.getTables(),
     };
     const users = await this.eventCoordinatorService.getUsersByOptions(options);
 
@@ -126,47 +134,27 @@ export class UserController {
     return result;
   }
 
-  @Version('1')
-  @Put('/:id/delete')
-  @Serialize(UserOutputDto)
-  async deleteUserCtrl(
-    @Param('id') id: string,
-    @CurrentUserId() currentUserId: string,
-  ) {
-    if (currentUserId !== id) {
-      throw new BadRequestException('USER_DELETE_NOT_ALLOWED');
-    }
+  // @Version('1')
+  // @Put('/:id/delete')
+  // @Serialize(UserOutputDto)
+  // async deleteUserCtrl(
+  //   @Param('id') id: string,
+  //   @CurrentUserId() currentUserId: string,
+  // ) {
+  //   if (currentUserId !== id) {
+  //     throw new BadRequestException('USER_DELETE_NOT_ALLOWED');
+  //   }
 
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('INVALID_USER_ID');
-    }
+  //   if (!Types.ObjectId.isValid(id)) {
+  //     throw new BadRequestException('INVALID_USER_ID');
+  //   }
 
-    const user = await this.eventCoordinatorService.getUserById(id);
-    if (!user) throw new NotFoundException('USER_NOT_FOUND');
+  //   const user = await this.eventCoordinatorService.getUserById(id);
+  //   if (!user) throw new NotFoundException('USER_NOT_FOUND');
 
-    const result = await this.eventCoordinatorService.deleteUser(user);
-    if (!result) throw new BadRequestException('USER_DELETE_FAILED');
+  //   const result = await this.eventCoordinatorService.deleteUser(user);
+  //   if (!result) throw new BadRequestException('USER_DELETE_FAILED');
 
-    return result;
-  }
-
-  private filterUsersByGroupAndTable(
-    users: UserClass[],
-    group: string | string[],
-    table: string,
-    currentUser: UserClass,
-  ): UserClass[] {
-    return users.filter((user) => {
-      if (user.id === currentUser.id) return true;
-      if (table && user.getTables().includes(table)) return true;
-
-      const hasGroupAccess =
-        !group ||
-        (Array.isArray(group)
-          ? group.some((g) => user.getGroups().includes(g))
-          : user.getGroups().includes(group));
-
-      return hasGroupAccess;
-    });
-  }
+  //   return result;
+  // }
 }

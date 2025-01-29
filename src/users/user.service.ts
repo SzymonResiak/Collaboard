@@ -140,7 +140,6 @@ export class UserService {
   private async getUsersByOptions(options: {
     id: string;
     groups: string[];
-    tables: string[];
   }): Promise<UserClass[]> {
     const filter = this.createUserFilter(options);
     return this.getUserListByFilter(filter);
@@ -158,20 +157,12 @@ export class UserService {
   //     }
   //   }
 
-  private createUserFilter(options: {
-    id: string;
-    groups: string[];
-    tables: string[];
-  }) {
+  private createUserFilter(options: { id: string; groups: string[] }) {
     const filter: any = {};
-    filter._id = options.id;
 
+    filter._id = options.id; //to always return self
     if (options.groups && options.groups.length > 0) {
       filter.groups = { $in: options.groups };
-    }
-
-    if (options.tables && options.tables.length > 0) {
-      filter.tables = { $in: options.tables };
     }
 
     return filter;
