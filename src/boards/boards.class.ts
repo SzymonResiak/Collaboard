@@ -57,7 +57,7 @@ export class BoardClass {
     if (this.description) schema.description = this.description;
     if (this.type) schema.type = this.type;
     const admins = Array.from(new Set([...this.admins]));
-    schema.admins = admins;
+    schema.admins = admins.map((admin) => new Types.ObjectId(admin));
     if (this.group) schema.group = new Types.ObjectId(this.group);
     if (this.createdBy) schema.createdBy = new Types.ObjectId(this.createdBy);
 

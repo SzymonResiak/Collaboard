@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -34,11 +36,21 @@ export class GroupController {
     @Body() groupDto: GroupCreateDto,
     @CurrentUserId() currentUserId: string,
   ) {
+    // upodate user groups
     const result = await this.eventCoordinatorService.createGroup({
-      createdBy: currentUserId, //make sure hes saved in admins[]
+      createdBy: currentUserId,
+      members: [currentUserId],
+      admins: [currentUserId],
       ...groupDto,
     });
-    if (!result) throw new Error('GROUP_CREATE_FAILED');
+    if (!result) throw new BadRequestException('GROUP_CREATE_FAILED');
+
+    const user = await this.eventCoordinatorService.getUserById(currentUserId);
+    this.eventCoordinatorService.updateUser({
+      user,
+      updates: { groups: [...user.getGroups(), result.id] },
+    });
+
     return result;
   }
 
@@ -56,12 +68,18 @@ export class GroupController {
   @Version('1')
   @Get(':id')
   @Serialize(GroupOutputDto)
-  async getGroupById(@Param('id') id: string) {
+  async getGroupById(
+    @Param('id') id: string,
+    @CurrentUserId() currentUserId: string,
+  ) {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('INVALID_GROUP_ID');
     }
     const group = await this.eventCoordinatorService.getGroupById(id);
-    if (!group) throw new Error('GROUP_NOT_FOUND');
+    if (!group) throw new NotFoundException('GROUP_NOT_FOUND');
+    if (!group.getMembers().includes(currentUserId)) {
+      throw new ForbiddenException('GROUP_ACCESS_NOT_ALLOWED');
+    }
     return group;
   }
 
@@ -70,14 +88,24 @@ export class GroupController {
   @Get()
   @Serialize(GroupOutputDto)
   async getGroupsByOptions(
-    @Body('ids') ids: string[],
-    @Body('board') board: string,
+    @CurrentUserId() currentUserId: string,
+    @Body('ids') ids?: string[],
+    @Body('board') board?: string,
   ) {
-    const options = { ids, board };
-    const groups = await this.eventCoordinatorService.getGroupsByOptions(options);
-    if (!groups) throw new Error('GROUPS_NOT_FOUND');
+    const user = await this.eventCoordinatorService.getUserById(currentUserId);
+    const options = { ids: ids ? ids : user.getGroups(), board };
 
-    return groups;
+    const groups =
+      await this.eventCoordinatorService.getGroupsByOptions(options);
+    if (!groups) {
+      throw new NotFoundException('GROUPS_NOT_FOUND');
+    }
+    const groupArray = Array.isArray(groups) ? groups : [groups];
+    const validGroups = groupArray.filter((group) =>
+      group.getMembers().includes(currentUserId),
+    ); // return only groups that the user is a member of
+
+    return validGroups;
   }
 
   //update group PATCH(':id')
@@ -93,19 +121,21 @@ export class GroupController {
       throw new BadRequestException('INVALID_GROUP_ID');
     }
     const group = await this.eventCoordinatorService.getGroupById(id);
-    if (!group) throw new Error('GROUP_NOT_FOUND');
+    if (!group) throw new NotFoundException('GROUP_NOT_FOUND');
 
-    if (currentUserId !== group.getCreatedBy()) {
-      throw new BadRequestException('GROUP_UPDATE_NOT_ALLOWED');
+    if (!group.getAdmins().includes(currentUserId)) {
+      throw new ForbiddenException('GROUP_UPDATE_NOT_ALLOWED');
     }
 
     const result = await this.eventCoordinatorService.updateGroup({
       group,
       updates: groupDto,
     });
-    if (!result) throw new Error('GROUP_UPDATE_FAILED');
+    if (!result) throw new BadRequestException('GROUP_UPDATE_FAILED');
     return result;
   }
 
   //delete group DELETE(':id')
+
+  // privates
 }

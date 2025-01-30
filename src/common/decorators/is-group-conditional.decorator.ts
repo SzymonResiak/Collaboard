@@ -1,4 +1,3 @@
-// src/decorators/group-conditional.decorator.ts
 import {
   registerDecorator,
   ValidationOptions,
@@ -12,25 +11,34 @@ export function IsGroupConditional(validationOptions?: ValidationOptions) {
     registerDecorator({
       name: 'isGroupConditional',
       target: object.constructor,
-      propertyName: propertyName,
+      propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
-          const boardType = (args.object as any).type;
+        validate(type: any, args: ValidationArguments) {
+          const { group } = args.object as any;
 
-          if (boardType === BoardType.GROUP) {
-            return Types.ObjectId.isValid(value);
+          if (type === BoardType.GROUP) {
+            return Types.ObjectId.isValid(group);
           }
 
-          return value === undefined || value === null;
+          if (type === BoardType.PERSONAL) {
+            return group === undefined || group === null;
+          }
+
+          return true;
         },
         defaultMessage(args: ValidationArguments) {
-          const boardType = (args.object as any).type;
+          const { group } = args.object as any;
+          const type = args.value;
 
-          if (boardType === BoardType.GROUP) {
-            return 'Group ID must be a valid MongoDB ObjectId when group type is "group"';
+          if (type === BoardType.GROUP) {
+            return 'Group ID must be a valid MongoDB ObjectId when type is "GROUP".';
           }
-          return 'Group field must be omitted when group type is not "private"';
+          if (type === BoardType.PERSONAL && group !== undefined) {
+            return 'Group field must not be present when type is "PERSONAL".';
+          }
+
+          return 'Invalid group field condition.';
         },
       },
     });

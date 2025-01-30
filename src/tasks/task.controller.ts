@@ -6,9 +6,9 @@ import {
   Param,
   Version,
   BadRequestException,
-  Query,
   Patch,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { TaskCreateDto } from './dto/create-task.dto';
 import { TaskOutputDto } from './dto/output-task.dto';
@@ -41,7 +41,7 @@ export class TaskController {
       createdBy: user.id,
       ...createTaskDto,
     });
-    if (!result) throw new Error('TASK_CREATE_FAILED');
+    if (!result) throw new BadRequestException('TASK_CREATE_FAILED');
     return result;
   }
 
@@ -62,7 +62,7 @@ export class TaskController {
     }
 
     const task = await this.eventCoordinatorService.getTaskById(id);
-    if (!task) throw new Error('TASK_NOT_FOUND');
+    if (!task) throw new NotFoundException('TASK_NOT_FOUND');
 
     return task;
   }
@@ -77,7 +77,7 @@ export class TaskController {
   ) {
     const options = { ids, group, board };
     const tasks = await this.eventCoordinatorService.getTasksByOptions(options);
-    if (!tasks) throw new Error('TASK_NOT_FOUND');
+    if (!tasks) throw new NotFoundException('TASK_NOT_FOUND');
 
     return tasks;
   }
@@ -95,7 +95,7 @@ export class TaskController {
     }
 
     const task = await this.eventCoordinatorService.getTaskById(id);
-    if (!task) throw new Error('TASK_NOT_FOUND');
+    if (!task) throw new NotFoundException('TASK_NOT_FOUND');
 
     if (
       currentUserId !== task.getCreatedBy() &&
@@ -108,7 +108,7 @@ export class TaskController {
       task,
       updates: taskDto,
     });
-    if (!result) throw new Error('TASK_UPDATE_FAILED');
+    if (!result) throw new BadRequestException('TASK_UPDATE_FAILED');
 
     return result;
   }

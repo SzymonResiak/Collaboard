@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Group } from './schemes/group';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { OnEvent } from '@nestjs/event-emitter';
 import * as Event from '../events/events';
 import { GroupClass } from './group.class';
@@ -108,7 +108,7 @@ export class GroupService {
       return result;
     } catch (error) {
       console.error(`Error getting group list by filter`, error);
-      return;
+      return [];
     }
   }
 
@@ -144,10 +144,19 @@ export class GroupService {
 
   //privates
   private createGroupFilter(options: { ids: string[]; board: string }) {
-    const filter: any = {};
+    const filter: any = {
+      $or: [],
+    };
 
-    if (options.ids) filter._id = { $in: options.ids };
-    if (options.board) filter.board = options.board;
+    if (options.ids) {
+      filter.$or.push({
+        _id: { $in: options.ids.map((id) => new Types.ObjectId(id)) },
+      });
+    }
+
+    if (options.board) {
+      filter.$or.push({ boards: { $in: [new Types.ObjectId(options.board)] } });
+    }
 
     return filter;
   }

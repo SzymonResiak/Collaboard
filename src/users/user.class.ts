@@ -10,7 +10,7 @@ export class UserClass {
   private email: string;
   private hashedPasswd: string;
   private groups: string[];
-  private tables: string[];
+  private boards: string[];
   private createdAt: Date;
   private updatedAt: Date;
 
@@ -32,7 +32,7 @@ export class UserClass {
     if (doc.name) this.name = doc.name;
     if (doc.email) this.email = doc.email;
     if (doc.groups) this.groups = [...doc.groups];
-    if (doc.tables) this.tables = [...doc.tables];
+    if (doc.boards) this.boards = [...doc.boards];
     if (doc.password) this.hashedPasswd = doc.password;
     if (doc.createdAt) this.createdAt = new Date(doc.createdAt);
     if (doc.updatedAt) this.updatedAt = new Date(doc.updatedAt);
@@ -53,7 +53,7 @@ export class UserClass {
     if (updates.name) this.name = updates.name;
     if (updates.email) this.email = updates.email;
     if (updates.groups) this.groups.push(...updates.groups);
-    if (updates.tables) this.tables.push(...updates.tables);
+    if (updates.boards) this.boards.push(...updates.boards);
     // if (updates.password) this.hashedPasswd = updates.password;
   }
 
@@ -68,8 +68,8 @@ export class UserClass {
     if (this.login) schema.login = this.login;
     if (this.name) schema.name = this.name;
     if (this.email) schema.email = this.email;
-    if (this.groups) schema.groups = [...this.groups];
-    if (this.tables) schema.tables = [...this.tables];
+    if (this.groups) schema.groups = Array.from(new Set([...this.groups]));
+    if (this.boards) schema.boards = Array.from(new Set([...this.boards]));
     if (this.hashedPasswd && this.isValidPassword(this.hashedPasswd)) {
       schema.password = this.hashedPasswd;
     }
@@ -87,8 +87,8 @@ export class UserClass {
     return this.groups;
   }
 
-  getTables(): string[] {
-    return this.tables;
+  getBoards(): string[] {
+    return this.boards;
   }
 
   // Placeholder for methods to manipulate user properties

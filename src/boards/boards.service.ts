@@ -79,6 +79,8 @@ export class BoardService {
 
       const result = new BoardClass(data);
       if (!result.isValid()) return;
+
+      return result;
     } catch (error) {
       console.error(`Error getting board by filter`, error);
       return;
@@ -104,7 +106,7 @@ export class BoardService {
       return result;
     } catch (error) {
       console.error(`Error getting board by filter`, error);
-      return;
+      return [];
     }
   }
 

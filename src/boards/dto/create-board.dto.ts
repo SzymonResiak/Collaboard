@@ -22,16 +22,17 @@ export class BoardCreateDto {
 
   @IsNotEmpty()
   @IsEnum(BoardType)
+  @IsGroupConditional()
   @ApiProperty()
   type: BoardType;
 
-  @IsGroupConditional()
+  @IsOptional()
   @IsMongoId()
   @ApiPropertyOptional()
   group?: string;
 
-  @IsNotEmpty({ each: true })
+  @IsOptional()
   @IsMongoId({ each: true })
-  @ApiProperty()
-  admins: string[];
+  @ApiPropertyOptional()
+  admins?: string[];
 }

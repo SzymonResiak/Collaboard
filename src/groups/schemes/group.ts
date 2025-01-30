@@ -9,10 +9,10 @@ export class Group extends Document {
   @Prop()
   description: string;
 
-  @Prop({ type: [Types.ObjectId], ref: 'User', required: true, default: [] })
+  @Prop({ type: [Types.ObjectId], ref: 'User', required: true })
   members: string[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'User', required: true, default: [] })
+  @Prop({ type: [Types.ObjectId], ref: 'User', required: true })
   admins: string[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Board', required: true, default: [] })

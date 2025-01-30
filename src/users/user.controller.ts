@@ -23,8 +23,6 @@ import { Types } from 'mongoose';
 import { UserUpdateDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { UserClass } from './user.class';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 
 @Controller('user')
@@ -86,7 +84,7 @@ export class UserController {
   /*
   returns all users that are in:
   - the specified group / current user's groups
-  - the specified table / current user's tables
+  - the specified board / current user's boards
   - the specified ids
   - the current user
   */

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsMongoId,
@@ -10,29 +10,29 @@ import {
 export class GroupUpdateDto {
   @IsOptional()
   @IsString()
-  @ApiProperty()
+  @ApiPropertyOptional()
   name?: string;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty()
+  @ApiPropertyOptional()
   description?: string;
 
   @IsOptional()
   @IsArray()
   @IsMongoId({ each: true })
-  @ApiProperty()
+  @ApiPropertyOptional()
   members?: string[];
 
   @IsOptional()
   @IsArray()
   @IsMongoId({ each: true })
-  @ApiProperty()
+  @ApiPropertyOptional()
   admins?: string[];
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ApiProperty()
+  @ApiPropertyOptional()
   boards?: string[];
 }

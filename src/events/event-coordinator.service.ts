@@ -151,7 +151,7 @@ export class EventCoordinatorService {
     return result;
   }
 
-  async getBoardByOptions(options: {
+  async getBoardsByOptions(options: {
     ids: string[];
     group: string;
   }): Promise<BoardClass[]> {
@@ -198,7 +198,7 @@ export class EventCoordinatorService {
     return result;
   }
 
-  async getGroupsByIds(ids: string[]): Promise<GroupClass> {
+  async getGroupsByIds(ids: string[]): Promise<GroupClass[]> {
     const result = (
       await this.eventEmitter.emitAsync(Event.GROUP_GET_LIST_BY_IDS, ids)
     )[0];

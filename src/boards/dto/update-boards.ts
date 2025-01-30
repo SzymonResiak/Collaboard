@@ -1,4 +1,10 @@
-import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { BoardType } from '../enums/board-type.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 

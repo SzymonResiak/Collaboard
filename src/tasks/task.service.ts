@@ -105,7 +105,7 @@ export class TaskService {
       return result;
     } catch (error) {
       console.error('Error getting task list by filter', error);
-      return;
+      return [];
     }
   }
 

@@ -17,7 +17,7 @@ export class Board extends Document {
   admins: Types.ObjectId[];
 
   @Prop({ type: Types.ObjectId, ref: 'Group' })
-  group?: string;
+  group?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   createdBy: Types.ObjectId;

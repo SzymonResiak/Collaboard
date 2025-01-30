@@ -22,7 +22,7 @@ export class User extends Document {
   groups: string[];
 
   @Prop({ default: [] })
-  tables: string[];
+  boards: string[];
 
   @Prop({ default: Date.now })
   updatedAt: Date;

@@ -13,7 +13,7 @@ export class GroupCreateDto {
   @ApiProperty()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @ApiProperty()
   description: string;
@@ -24,11 +24,11 @@ export class GroupCreateDto {
   @ApiPropertyOptional()
   members?: string[];
 
-  @IsNotEmpty()
-  @IsArray()
-  @IsMongoId({ each: true })
-  @ApiProperty()
-  admins: string[];
+  // @IsOptional()
+  // @IsArray()
+  // @IsMongoId({ each: true })
+  // @ApiProperty()
+  // admins: string[];
 
   @IsOptional()
   @IsArray()
