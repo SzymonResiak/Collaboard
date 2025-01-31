@@ -3,12 +3,10 @@ import {
   Get,
   Version,
   Param,
-  Post,
   BadRequestException,
   Patch,
   Body,
   NotFoundException,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -18,7 +16,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 // import { AuthGuard } from 'src/auth/guards/auth.guard'; // TODO: implement
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { UserOutputDto } from './dto/output-user.dto';
-import { UserCreateDto } from './dto/create-user.dto';
 import { Types } from 'mongoose';
 import { UserUpdateDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
@@ -34,19 +31,20 @@ export class UserController {
     private readonly eventCoordinatorService: EventCoordinatorService,
   ) {}
 
-  @Version('1')
-  @Post()
-  @Serialize(UserOutputDto)
-  async createUserCtrl(@Body() userDto: UserCreateDto) {
-    const user = await this.eventCoordinatorService.getUserByLogin(
-      userDto.login,
-    );
-    if (user) throw new BadRequestException('USER_NAME_EXISTS'); // move to separate error constants
+  // Removed POST /user endpoint
+  // @Version('1')
+  // @Post()
+  // @Serialize(UserOutputDto)
+  // async createUserCtrl(@Body() userDto: UserCreateDto) {
+  //   const user = await this.eventCoordinatorService.getUserByLogin(
+  //     userDto.login,
+  //   );
+  //   if (user) throw new BadRequestException('USER_NAME_EXISTS'); // move to separate error constants
 
-    const result = this.eventCoordinatorService.createUser(userDto);
-    if (!result) throw new BadRequestException('USER_CREATE_FAILED');
-    return result;
-  }
+  //   const result = this.eventCoordinatorService.createUser(userDto);
+  //   if (!result) throw new BadRequestException('USER_CREATE_FAILED');
+  //   return result;
+  // }
 
   // @Version('1') only for development purposes, getAllUsers can be used in services only
   // TODO: add user #{id} where id will be 6 digit number. This will be used to fetch user that we want to add to our groups
