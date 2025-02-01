@@ -34,7 +34,7 @@ export class AuthController {
     );
     if (user) throw new BadRequestException('USER_NAME_EXISTS');
 
-    const result = this.eventCoordinatorService.createUser(userDto);
+    const result = await this.eventCoordinatorService.createUser(userDto);
     if (!result) throw new BadRequestException('USER_CREATE_FAILED');
     return result;
   }

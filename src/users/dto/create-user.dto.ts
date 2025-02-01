@@ -15,11 +15,11 @@ export class UserCreateDto {
   login: string;
 
   @IsString()
-  @MinLength(8, { message: 'Password is too short (8 characters min)' })
+  @MinLength(6, { message: 'Password is too short (6 characters min)' })
   @MaxLength(64, { message: 'Password is too long (64 characters max)' })
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ minLength: 4, maxLength: 64 })
+  @ApiProperty({ minLength: 6, maxLength: 64 })
   password: string;
 
   @IsNotEmpty()
