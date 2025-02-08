@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsEnum,
-  IsMongoId,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { BoardType } from '../enums/board-type.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -18,6 +12,16 @@ export class BoardUpdateDto {
   @IsString()
   @ApiPropertyOptional()
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  color?: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  @ApiPropertyOptional()
+  columns?: string[];
 
   @IsOptional()
   @IsEnum(BoardType)

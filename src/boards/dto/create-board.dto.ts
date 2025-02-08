@@ -20,11 +20,21 @@ export class BoardCreateDto {
   @ApiPropertyOptional()
   description?: string;
 
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  color?: string;
+
   @IsNotEmpty()
   @IsEnum(BoardType)
   @IsGroupConditional()
   @ApiProperty()
   type: BoardType;
+
+  @IsOptional()
+  @IsString({ each: true })
+  @ApiPropertyOptional()
+  columns?: string[];
 
   @IsOptional()
   @IsMongoId()

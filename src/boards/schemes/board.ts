@@ -13,6 +13,9 @@ export class Board extends Document {
   @Prop({ required: true, enum: BoardType })
   type: BoardType;
 
+  @Prop({ required: true })
+  color: string;
+
   @Prop({ type: [Types.ObjectId], ref: 'User', required: true })
   admins: Types.ObjectId[];
 

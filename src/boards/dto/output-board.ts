@@ -1,4 +1,6 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
+import { TaskOutputDto } from 'src/tasks/dto/output-task.dto';
 
 export class BoardOutputDto {
   @Expose()
@@ -11,8 +13,20 @@ export class BoardOutputDto {
   description: string;
 
   @Expose()
+  color: string;
+
+  @Expose()
+  columns: string[];
+
+  @Expose()
   admins: string[];
 
   @Expose()
   group: string;
+
+  @Expose()
+  @Transform(({ value }) => value || undefined)
+  @ValidateNested({ each: true })
+  @Type(() => TaskOutputDto)
+  tasks: TaskOutputDto[];
 }

@@ -10,8 +10,8 @@ export class Task extends Document {
   @Prop({ trim: true })
   description?: string;
 
-  @Prop({ enum: TaskStatus, default: TaskStatus.TODO, index: true })
-  status: TaskStatus;
+  @Prop({ default: TaskStatus.TODO, index: true })
+  status: string;
 
   @Prop({ type: Types.ObjectId, ref: 'User', index: true })
   createdBy: Types.ObjectId;

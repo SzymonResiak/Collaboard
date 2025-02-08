@@ -128,6 +128,12 @@ export class BoardService {
     return this.getBoardListByFilter({ _id: { $in: ids } });
   }
 
+  // GET BY NAME
+  @OnEvent(Event.BOARD_GET_BY_NAME, { promisify: true })
+  async getBoardByName(name: string): Promise<BoardClass> {
+    return this.getBoardByFilter({ name });
+  }
+
   // GET BY OPTIONS
   @OnEvent(Event.BOARD_GET_LIST_BY_OPTIONS, { promisify: true })
   async getBoardsByOptions(options: {

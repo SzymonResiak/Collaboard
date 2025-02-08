@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Task } from './schemes/task';
 import { OnEvent } from '@nestjs/event-emitter';
 import * as Event from '../events/events';
@@ -151,12 +151,22 @@ export class TaskService {
     group: string;
     board: string;
   }): any {
-    const filter: any = {};
+    const conditions = [];
 
-    if (options.ids) filter._id = { $in: options.ids };
-    if (options.group) filter.group = options.group;
-    if (options.board) filter.table = options.board;
+    if (options.ids?.length > 0) {
+      conditions.push({ _id: { $in: options.ids } });
+    }
+    if (options.group) {
+      conditions.push({ board: new Types.ObjectId(options.group) });
+    }
+    if (options.board) {
+      conditions.push({ board: new Types.ObjectId(options.board) });
+    }
 
-    return filter;
+    if (conditions.length === 0) {
+      return {};
+    }
+
+    return conditions.length === 1 ? conditions[0] : { $or: conditions };
   }
 }

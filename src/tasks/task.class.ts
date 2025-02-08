@@ -1,5 +1,4 @@
 import { Model, Types } from 'mongoose';
-import { TaskStatus } from './enums/task-status.enum';
 import { Task } from './schemes/task';
 import { isDateValid } from 'src/common/utils/isDateValid';
 export class TaskClass {
@@ -7,7 +6,7 @@ export class TaskClass {
 
   private title: string;
   private description: string;
-  private status: TaskStatus;
+  private status: string;
   private assignees: string[];
   private dueDate: Date;
   private board: string;
@@ -42,7 +41,6 @@ export class TaskClass {
   isValid(): boolean {
     if (!this.title || !this.createdBy || !this.board) return false;
     if (!Array.isArray(this.assignees)) return false;
-    if (!Object.values(TaskStatus).includes(this.status)) return false;
     if (this.dueDate && !isDateValid(this.dueDate)) return false;
 
     return true;
@@ -78,8 +76,6 @@ export class TaskClass {
   }
 
   // Placeholder for getters
-  // getTitle(): string { return this.title; }
-  // getStatus(): TaskStatus { return this.status; }
 
   getAssignees(): string[] {
     return [...this.assignees];

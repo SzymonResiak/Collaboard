@@ -22,7 +22,6 @@ export class TaskUpdateDto {
 
   @IsOptional()
   @IsString()
-  @IsEnum(TaskStatus)
   @ApiPropertyOptional()
   status?: string;
 

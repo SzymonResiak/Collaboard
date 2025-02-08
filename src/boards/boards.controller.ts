@@ -96,6 +96,43 @@ export class BoardController {
     return board;
   }
 
+  @Version('1')
+  @Get('name/:name')
+  @Serialize(BoardOutputDto)
+  async getBoardByName(
+    @Param('name') name: string,
+    @CurrentUserId() currentUserId: string,
+  ) {
+    const board = await this.eventCoordinatorService.getBoardByName(name);
+    if (!board) throw new NotFoundException('BOARD_NOT_FOUND');
+
+    if (board.getType() === BoardType.GROUP) {
+      const group = await this.eventCoordinatorService.getGroupById(
+        board.getGroup(),
+      );
+      if (!group) throw new NotFoundException('GROUP_NOT_FOUND');
+      if (!group.getMembers().includes(currentUserId)) {
+        throw new ForbiddenException('GROUP_ACCESS_NOT_ALLOWED');
+      }
+    }
+    if (board.getType() === BoardType.PERSONAL) {
+      if (!board.getAdmins().includes(currentUserId)) {
+        throw new ForbiddenException('PERSONAL_BOARD_ACCESS_NOT_ALLOWED');
+      }
+    }
+
+    const tasks = await this.eventCoordinatorService.getTasksByOptions({
+      ids: [],
+      group: '',
+      board: board.id,
+    });
+
+    return {
+      ...board,
+      tasks: tasks,
+    };
+  }
+
   //get by options GET('')
   @Version('1')
   @Get()
@@ -114,7 +151,7 @@ export class BoardController {
       throw new NotFoundException('BOARDS_NOT_FOUND');
     }
 
-    const validBoards: BoardClass[] = [];
+    const validBoards = [];
     for (const board of boards) {
       if (board.getType() === BoardType.GROUP) {
         const groups = await this.eventCoordinatorService.getGroupsByIds([
@@ -124,7 +161,15 @@ export class BoardController {
 
         for (const group of groups) {
           if (group.getMembers().includes(currentUserId)) {
-            validBoards.push(board);
+            const tasks = await this.eventCoordinatorService.getTasksByOptions({
+              ids: [],
+              group: '',
+              board: board.id,
+            });
+            validBoards.push({
+              ...board,
+              tasks,
+            });
           }
         }
       }
@@ -133,7 +178,15 @@ export class BoardController {
         board.getType() === BoardType.PERSONAL &&
         board.getCreatedBy() === currentUserId
       ) {
-        validBoards.push(board);
+        const tasks = await this.eventCoordinatorService.getTasksByOptions({
+          ids: [],
+          group: '',
+          board: board.id,
+        });
+        validBoards.push({
+          ...board,
+          tasks,
+        });
       }
     }
 

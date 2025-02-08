@@ -8,7 +8,8 @@ export class BoardClass {
   private name: string;
   private description: string;
   private type: BoardType;
-
+  private color: string;
+  private columns: string[];
   private admins: string[];
   private group: string;
 
@@ -31,6 +32,8 @@ export class BoardClass {
     if (doc.name) this.name = doc.name;
     if (doc.description) this.description = doc.description;
     if (doc.type) this.type = doc.type;
+    if (doc.color) this.color = doc.color;
+    if (doc.columns) this.columns = doc.columns;
     if (doc.createdBy) this.createdBy = doc.createdBy;
     this.admins = Array.isArray(doc.admins) ? doc.admins : [];
     if (doc.group) this.group = doc.group;
@@ -47,6 +50,8 @@ export class BoardClass {
   update(updates: any): void {
     if (updates.name) this.name = updates.name;
     if (updates.description) this.description = updates.description;
+    if (updates.color) this.color = updates.color;
+    if (updates.columns) this.columns = updates.columns;
   }
 
   toMongoModel(): Partial<Board> {
@@ -56,6 +61,8 @@ export class BoardClass {
     if (this.name) schema.name = this.name;
     if (this.description) schema.description = this.description;
     if (this.type) schema.type = this.type;
+    if (this.color) schema.color = this.color;
+    if (this.columns) schema.columns = this.columns;
     const admins = Array.from(new Set([...this.admins]));
     schema.admins = admins.map((admin) => new Types.ObjectId(admin));
     if (this.group) schema.group = new Types.ObjectId(this.group);

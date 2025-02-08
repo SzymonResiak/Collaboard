@@ -151,6 +151,13 @@ export class EventCoordinatorService {
     return result;
   }
 
+  async getBoardByName(name: string): Promise<BoardClass> {
+    const result = (
+      await this.eventEmitter.emitAsync(Event.BOARD_GET_BY_NAME, name)
+    )[0];
+    return result;
+  }
+
   async getBoardsByOptions(options: {
     ids: string[];
     group: string;

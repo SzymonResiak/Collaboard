@@ -23,6 +23,7 @@ export const BOARD_CREATE = 'board.createBoard';
 export const BOARD_UPDATE = 'board.updateBoard';
 export const BOARD_GET_ALL = 'board.getAllBoards';
 export const BOARD_GET_BY_ID = 'board.getBoardById';
+export const BOARD_GET_BY_NAME = 'board.getBoardByName';
 export const BOARD_GET_LIST_BY_IDS = 'board.getBoardsByIds';
 export const BOARD_GET_LIST_BY_OPTIONS = 'board.getBoardsByOptions';
 export const BOARD_DELETE = 'board.deleteBoard';
