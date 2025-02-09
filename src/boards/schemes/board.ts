@@ -22,6 +22,9 @@ export class Board extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Group' })
   group?: Types.ObjectId;
 
+  @Prop({ type: Boolean, default: false })
+  favourite: boolean;
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   createdBy: Types.ObjectId;
 }

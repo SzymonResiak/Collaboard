@@ -12,7 +12,7 @@ export class BoardClass {
   private columns: string[];
   private admins: string[];
   private group: string;
-
+  private favourite: boolean;
   private createdBy: string;
 
   constructor(obj: any) {
@@ -37,6 +37,7 @@ export class BoardClass {
     if (doc.createdBy) this.createdBy = doc.createdBy;
     this.admins = Array.isArray(doc.admins) ? doc.admins : [];
     if (doc.group) this.group = doc.group;
+    if (doc.favourite) this.favourite = doc.favourite;
   }
 
   isValid() {
@@ -52,6 +53,8 @@ export class BoardClass {
     if (updates.description) this.description = updates.description;
     if (updates.color) this.color = updates.color;
     if (updates.columns) this.columns = updates.columns;
+    if (typeof updates.favourite === 'boolean')
+      this.favourite = updates.favourite;
   }
 
   toMongoModel(): Partial<Board> {
@@ -67,7 +70,7 @@ export class BoardClass {
     schema.admins = admins.map((admin) => new Types.ObjectId(admin));
     if (this.group) schema.group = new Types.ObjectId(this.group);
     if (this.createdBy) schema.createdBy = new Types.ObjectId(this.createdBy);
-
+    if (typeof this.favourite === 'boolean') schema.favourite = this.favourite;
     return schema;
   }
 
@@ -81,6 +84,11 @@ export class BoardClass {
 
   getType(): BoardType {
     return this.type;
+  }
+
+  // use to filter favourites on top of the array.
+  getFavourite(): boolean {
+    return this.favourite;
   }
 
   getCreatedBy(): string {

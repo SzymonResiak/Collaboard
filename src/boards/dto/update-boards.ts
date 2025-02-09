@@ -1,4 +1,10 @@
-import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { BoardType } from '../enums/board-type.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -32,4 +38,9 @@ export class BoardUpdateDto {
   @IsMongoId({ each: true })
   @ApiPropertyOptional()
   admins?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiPropertyOptional()
+  favourite?: boolean;
 }

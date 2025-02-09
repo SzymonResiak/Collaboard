@@ -22,7 +22,6 @@ import { BoardUpdateDto } from './dto/update-boards';
 import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
 import { BoardType } from './enums/board-type.enum';
-import { BoardClass } from './boards.class';
 
 @Controller('boards')
 @UseGuards(JwtAuthGuard, AuthGuard)

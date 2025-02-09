@@ -25,6 +25,10 @@ export class BoardOutputDto {
   group: string;
 
   @Expose()
+  @Transform(({ value }) => Boolean(value))
+  favourite: boolean;
+
+  @Expose()
   @Transform(({ value }) => value || undefined)
   @ValidateNested({ each: true })
   @Type(() => TaskOutputDto)
