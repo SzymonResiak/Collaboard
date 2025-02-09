@@ -10,19 +10,44 @@ import { UserUpdateDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
+
+  private async generateUniqueMemberCode(): Promise<string> {
+    let isUnique = false;
+    let memberCode = '';
+
+    while (!isUnique) {
+      memberCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const existingUser = await this.userModel.findOne({ memberCode });
+      if (!existingUser) {
+        isUnique = true;
+      }
+    }
+
+    return memberCode;
+  }
 
   // CREATE
   @OnEvent(Event.USER_CREATE, { promisify: true })
   async createUser(obj: UserCreateDto): Promise<UserClass> {
     try {
       const user = new UserClass(obj);
-      await user.setPasswd(obj.password);
       if (!user.isValid()) return;
 
-      const userToCreate: User = new this.userModel(user.toMongoModel());
-      const createdUser = await userToCreate.save();
+      const existingUser = await this.userModel.findOne({
+        $or: [{ login: obj.login }, { email: obj.email }],
+      });
+      if (existingUser) return;
 
+      const memberCode = await this.generateUniqueMemberCode();
+      const userToCreate = new this.userModel({
+        ...user.toMongoModel(),
+        memberCode,
+      });
+
+      const createdUser = await userToCreate.save();
       const result = new UserClass(createdUser);
       if (!result.isValid()) return;
 

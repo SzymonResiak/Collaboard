@@ -1,6 +1,8 @@
 import { Model, Types } from 'mongoose';
 import { Board } from './schemes/board';
 import { BoardType } from './enums/board-type.enum';
+import { BoardColors } from './enums/board-colors.enum';
+import { Column } from './interfaces/column.interface';
 
 export class BoardClass {
   readonly id: string;
@@ -8,8 +10,8 @@ export class BoardClass {
   private name: string;
   private description: string;
   private type: BoardType;
-  private color: string;
-  private columns: string[];
+  private color: BoardColors;
+  private columns: Column[];
   private admins: string[];
   private group: string;
   private favourite: boolean;
@@ -33,11 +35,16 @@ export class BoardClass {
     if (doc.description) this.description = doc.description;
     if (doc.type) this.type = doc.type;
     if (doc.color) this.color = doc.color;
-    if (doc.columns) this.columns = doc.columns;
     if (doc.createdBy) this.createdBy = doc.createdBy;
-    this.admins = Array.isArray(doc.admins) ? doc.admins : [];
     if (doc.group) this.group = doc.group;
     if (doc.favourite) this.favourite = doc.favourite;
+    if (Array.isArray(doc.admins)) this.admins = [...doc.admins];
+    if (Array.isArray(doc.columns)) {
+      this.columns = doc.columns.map((column) => ({
+        name: column.name,
+        color: column.color,
+      }));
+    }
   }
 
   isValid() {
@@ -51,8 +58,17 @@ export class BoardClass {
   update(updates: any): void {
     if (updates.name) this.name = updates.name;
     if (updates.description) this.description = updates.description;
-    if (updates.color) this.color = updates.color;
-    if (updates.columns) this.columns = updates.columns;
+    if (updates.color && Object.values(BoardColors).includes(updates.color)) {
+      this.color = updates.color;
+    }
+    if (Array.isArray(updates.columns)) {
+      this.columns = updates.columns.map((col) => ({
+        name: col.name,
+        color: Object.values(BoardColors).includes(col.color)
+          ? col.color
+          : BoardColors.PURPLE,
+      }));
+    }
     if (typeof updates.favourite === 'boolean')
       this.favourite = updates.favourite;
   }
@@ -65,12 +81,21 @@ export class BoardClass {
     if (this.description) schema.description = this.description;
     if (this.type) schema.type = this.type;
     if (this.color) schema.color = this.color;
-    if (this.columns) schema.columns = this.columns;
-    const admins = Array.from(new Set([...this.admins]));
-    schema.admins = admins.map((admin) => new Types.ObjectId(admin));
-    if (this.group) schema.group = new Types.ObjectId(this.group);
     if (this.createdBy) schema.createdBy = new Types.ObjectId(this.createdBy);
+    if (this.group) schema.group = new Types.ObjectId(this.group);
     if (typeof this.favourite === 'boolean') schema.favourite = this.favourite;
+
+    if (this.columns) {
+      schema.columns = this.columns.map((column) => ({
+        name: column.name,
+        color: column.color,
+      }));
+    }
+
+    if (Array.isArray(this.admins)) {
+      schema.admins = this.admins.map((id) => new Types.ObjectId(id));
+    }
+
     return schema;
   }
 

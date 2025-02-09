@@ -4,9 +4,13 @@ import {
   IsMongoId,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { BoardType } from '../enums/board-type.enum';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { BoardColors } from '../enums/board-colors.enum';
+import { Column } from '../interfaces/column.interface';
 
 export class BoardUpdateDto {
   @IsOptional()
@@ -21,13 +25,15 @@ export class BoardUpdateDto {
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional()
-  color?: string;
+  @IsEnum(BoardColors)
+  @ApiPropertyOptional({ enum: BoardColors })
+  color?: BoardColors;
 
   @IsOptional()
-  @IsString({ each: true })
+  @ValidateNested({ each: true })
+  @Type(() => ColumnDto)
   @ApiPropertyOptional()
-  columns?: string[];
+  columns?: Column[];
 
   @IsOptional()
   @IsEnum(BoardType)
@@ -43,4 +49,14 @@ export class BoardUpdateDto {
   @IsBoolean()
   @ApiPropertyOptional()
   favourite?: boolean;
+}
+
+export class ColumnDto {
+  @IsString()
+  @ApiProperty()
+  name: string;
+
+  @IsEnum(BoardColors)
+  @ApiProperty({ enum: BoardColors })
+  color: BoardColors;
 }

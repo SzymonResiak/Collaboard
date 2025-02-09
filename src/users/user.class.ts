@@ -13,6 +13,7 @@ export class UserClass {
   private boards: string[];
   private createdAt: Date;
   private updatedAt: Date;
+  private memberCode: string;
 
   constructor(obj: any) {
     if (!obj || typeof obj !== 'object') return;
@@ -25,6 +26,10 @@ export class UserClass {
       if (obj.id) this.id = obj.id;
       this.objectConstructor(obj);
     }
+
+    if (!obj.memberCode) {
+      this.memberCode = this.generateMemberCode();
+    }
   }
 
   private objectConstructor(doc: any) {
@@ -36,6 +41,7 @@ export class UserClass {
     if (doc.password) this.hashedPasswd = doc.password;
     if (doc.createdAt) this.createdAt = new Date(doc.createdAt);
     if (doc.updatedAt) this.updatedAt = new Date(doc.updatedAt);
+    if (doc.memberCode) this.memberCode = doc.memberCode;
   }
 
   isValid(): boolean {
@@ -73,6 +79,7 @@ export class UserClass {
     if (this.hashedPasswd && this.isValidPassword(this.hashedPasswd)) {
       schema.password = this.hashedPasswd;
     }
+    if (this.memberCode) schema.memberCode = this.memberCode;
     return schema;
   }
 
@@ -96,5 +103,9 @@ export class UserClass {
   async setPasswd(password: string) {
     this.hashedPasswd = await bcrypt.hash(password, 10);
     return !!this.hashedPasswd;
+  }
+
+  private generateMemberCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 }

@@ -1,6 +1,16 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { TaskOutputDto } from 'src/tasks/dto/output-task.dto';
+import { BoardColors } from '../enums/board-colors.enum';
+
+export class ColumnOutputDto {
+  @Expose()
+  name: string;
+
+  @Expose()
+  @Transform(({ value }) => value || BoardColors.PURPLE)
+  color: BoardColors;
+}
 
 export class BoardOutputDto {
   @Expose()
@@ -16,7 +26,17 @@ export class BoardOutputDto {
   color: string;
 
   @Expose()
-  columns: string[];
+  @ValidateNested({ each: true })
+  @Type(() => ColumnOutputDto)
+  @Transform(({ value }) =>
+    Array.isArray(value)
+      ? value.map((col) => ({
+          name: col.name,
+          color: col.color,
+        }))
+      : [],
+  )
+  columns: ColumnOutputDto[];
 
   @Expose()
   admins: string[];
@@ -29,8 +49,8 @@ export class BoardOutputDto {
   favourite: boolean;
 
   @Expose()
-  @Transform(({ value }) => value || undefined)
   @ValidateNested({ each: true })
   @Type(() => TaskOutputDto)
+  @Transform(({ value }) => value || [])
   tasks: TaskOutputDto[];
 }

@@ -4,10 +4,24 @@ import {
   IsMongoId,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { BoardType } from '../enums/board-type.enum';
 import { IsGroupConditional } from 'src/common/decorators/is-group-conditional.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { BoardColors } from '../enums/board-colors.enum';
+
+export class ColumnDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  name: string;
+
+  @IsEnum(BoardColors)
+  @ApiProperty({ enum: BoardColors })
+  color: BoardColors;
+}
 
 export class BoardCreateDto {
   @IsNotEmpty()
@@ -32,9 +46,10 @@ export class BoardCreateDto {
   type: BoardType;
 
   @IsOptional()
-  @IsString({ each: true })
+  @ValidateNested({ each: true })
+  @Type(() => ColumnDto)
   @ApiPropertyOptional()
-  columns?: string[];
+  columns?: ColumnDto[];
 
   @IsOptional()
   @IsMongoId()
