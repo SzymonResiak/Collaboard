@@ -1,9 +1,9 @@
-version: "3.8"
+version: '3.8'
 services:
   app:
     build: ../../src
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - mongo
     environment:
@@ -12,9 +12,17 @@ services:
   mongo:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongo-data:/data/db
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=eu-north-1
 
 volumes:
   mongo-data:

@@ -1,5 +1,14 @@
-import { IsString, IsNotEmpty, IsArray, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  IsDateString,
+  IsOptional,
+  ValidateNested,
+  IsBoolean,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class TaskCreateDto {
   @IsNotEmpty()
@@ -12,24 +21,52 @@ export class TaskCreateDto {
   @ApiProperty()
   status: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   @ApiProperty()
-  assignees: string[];
+  assignees?: string[];
 
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
   board: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
   @ApiProperty()
-  dueDate: Date;
+  dueDate?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @ApiProperty()
-  description: string;
+  description?: string;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ChecklistDto)
+  @ApiProperty()
+  checklists?: ChecklistDto[];
+}
+
+export class ChecklistDto {
+  @IsString()
+  @ApiProperty()
+  name: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => ChecklistItemDto)
+  @ApiProperty()
+  items: ChecklistItemDto[];
+}
+
+export class ChecklistItemDto {
+  @IsString()
+  @ApiProperty()
+  text: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty()
+  isCompleted?: boolean = false;
 }

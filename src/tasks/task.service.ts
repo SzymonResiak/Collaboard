@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Task } from './schemes/task';
@@ -7,11 +7,13 @@ import * as Event from '../events/events';
 import { TaskCreateDto } from './dto/create-task.dto';
 import { TaskClass } from './task.class';
 import { TaskUpdateDto } from './dto/update-task.dto';
+import { FileService } from '../common/services/file.service';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<Task>,
+    private fileService: FileService,
   ) {}
 
   // CREATE
@@ -168,5 +170,79 @@ export class TaskService {
     }
 
     return conditions.length === 1 ? conditions[0] : { $or: conditions };
+  }
+
+  async addAttachment(
+    taskId: string,
+    file: any,
+    userId: string,
+  ): Promise<Task> {
+    try {
+      const attachment = await this.fileService.saveFile(file, userId);
+
+      const task = await this.taskModel.findByIdAndUpdate(
+        taskId,
+        {
+          $push: { attachments: attachment },
+        },
+        { new: true },
+      );
+
+      if (!task) {
+        await this.fileService.deleteFile(attachment.path);
+        await this.fileService.deleteFile(attachment.thumbnailPath);
+        throw new NotFoundException('Task not found');
+      }
+
+      return task;
+    } catch (error) {
+      console.error('Error adding attachment', error);
+      throw error;
+    }
+  }
+
+  async removeAttachment(taskId: string, attachmentId: string): Promise<Task> {
+    const task = await this.taskModel.findById(taskId);
+    if (!task) {
+      throw new NotFoundException('Task nie istnieje');
+    }
+
+    const attachment = task.attachments.find(
+      (a) => a._id.toString() === attachmentId || a.id === attachmentId,
+    );
+
+    if (!attachment) {
+      throw new NotFoundException('Załącznik nie istnieje');
+    }
+
+    try {
+      if (attachment.path) {
+        await this.fileService.deleteFile(attachment.path);
+      }
+      if (attachment.thumbnailPath) {
+        await this.fileService.deleteFile(attachment.thumbnailPath);
+      }
+
+      return this.taskModel.findByIdAndUpdate(
+        taskId,
+        {
+          $pull: { attachments: { _id: attachment._id } },
+        },
+        { new: true },
+      );
+    } catch (error) {
+      console.error('Error removing attachment:', error);
+      throw error;
+    }
+  }
+
+  @OnEvent(Event.TASK_ADD_ATTACHMENT)
+  async handleAddAttachment({ taskId, file, userId }) {
+    return this.addAttachment(taskId, file, userId);
+  }
+
+  @OnEvent(Event.TASK_REMOVE_ATTACHMENT)
+  async handleRemoveAttachment({ taskId, attachmentId }) {
+    return this.removeAttachment(taskId, attachmentId);
   }
 }

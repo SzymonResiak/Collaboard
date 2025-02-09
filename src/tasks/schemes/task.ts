@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { TaskStatus } from '../enums/task-status.enum';
+import { Checklist } from '../interfaces/checklist.interface';
+import { Attachment } from '../interfaces/attachment.interface';
 
 @Schema({ timestamps: true })
 export class Task extends Document {
@@ -27,6 +29,41 @@ export class Task extends Document {
 
   @Prop()
   completedAt?: Date;
+
+  @Prop({
+    type: [
+      {
+        name: { type: String, required: true },
+        items: [
+          {
+            id: { type: String, required: true },
+            text: { type: String, required: true },
+            isCompleted: { type: Boolean, default: false },
+            createdAt: { type: Date, default: Date.now },
+            completedAt: { type: Date },
+          },
+        ],
+      },
+    ],
+    default: [],
+  })
+  checklists: Checklist[];
+
+  @Prop({
+    type: [
+      {
+        id: { type: String, required: true },
+        filename: { type: String, required: true },
+        path: { type: String, required: true },
+        mimeType: { type: String, required: true },
+        size: { type: Number, required: true },
+        createdAt: { type: Date, default: Date.now },
+        uploadedBy: { type: Types.ObjectId, ref: 'User', required: true },
+      },
+    ],
+    default: [],
+  })
+  attachments: Attachment[];
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

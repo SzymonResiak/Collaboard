@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyPublicAccess",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::collaboard-attachments",
+        "arn:aws:s3:::collaboard-attachments/*"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    },
+    {
+      "Sid": "AllowSpecificActions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::536697234416:user/collaboard-app-user"
+      },
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+      "Resource": ["arn:aws:s3:::collaboard-attachments/*"]
+    }
+  ]
+}

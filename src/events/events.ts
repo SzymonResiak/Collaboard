@@ -7,6 +7,8 @@ export const TASK_GET_BY_ID = 'task.getTaskById';
 export const TASK_GET_LIST_BY_IDS = 'task.getTasksByIds';
 export const TASK_GET_LIST_BY_OPTIONS = 'task.getTasksByOptions';
 export const TASK_DELETE = 'task.deleteTask';
+export const TASK_ADD_ATTACHMENT = 'task.attachment.add';
+export const TASK_REMOVE_ATTACHMENT = 'task.attachment.remove';
 
 // USER
 export const USER_CREATE = 'user.createUser';

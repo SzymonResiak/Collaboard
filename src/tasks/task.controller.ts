@@ -9,12 +9,15 @@ import {
   Patch,
   UseGuards,
   NotFoundException,
+  UseInterceptors,
+  UploadedFile,
+  Delete,
 } from '@nestjs/common';
 import { TaskCreateDto } from './dto/create-task.dto';
 import { TaskOutputDto } from './dto/output-task.dto';
 import { Serialize } from '../common/interceptors/serialize.interceptor';
 import { EventCoordinatorService } from '../events/event-coordinator.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { UserClass } from 'src/users/user.class';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -22,6 +25,11 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { TaskUpdateDto } from './dto/update-task.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
+import { ParseFilePipe } from '@nestjs/common';
+import { MaxFileSizeValidator } from 'src/common/validators/max-file-size.validator';
+import { FileTypeValidator } from 'src/common/validators/file-type.validator';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard, AuthGuard)
@@ -123,4 +131,42 @@ export class TaskController {
   // ): Promise<Task> {
   //   return this.eventCoordinatorService.updateTaskStatus(id, status);
   // }
+
+  @Post(':taskId/attachments')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async addAttachment(
+    @Param('taskId', new ParseObjectIdPipe()) taskId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+          new FileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @CurrentUserId() userId: string,
+  ) {
+    return this.eventCoordinatorService.addAttachment(taskId, file, userId);
+  }
+
+  @Delete(':taskId/attachments/:attachmentId')
+  async removeAttachment(
+    @Param('taskId') taskId: string,
+    @Param('attachmentId') attachmentId: string,
+  ) {
+    return this.eventCoordinatorService.removeAttachment(taskId, attachmentId);
+  }
 }

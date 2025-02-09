@@ -225,4 +225,19 @@ export class EventCoordinatorService {
   async deleteGroup(data: any): Promise<any> {
     // return;
   }
+
+  async addAttachment(taskId: string, file: any, userId: string) {
+    return this.eventEmitter.emitAsync(Event.TASK_ADD_ATTACHMENT, {
+      taskId,
+      file,
+      userId,
+    });
+  }
+
+  async removeAttachment(taskId: string, attachmentId: string) {
+    return this.eventEmitter.emitAsync(Event.TASK_REMOVE_ATTACHMENT, {
+      taskId,
+      attachmentId,
+    });
+  }
 }

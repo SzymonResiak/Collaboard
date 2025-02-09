@@ -50,4 +50,16 @@ export class TaskUpdateDto {
   @IsString()
   @ApiPropertyOptional()
   createdBy: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ApiPropertyOptional()
+  checklistItems?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ApiPropertyOptional()
+  attachments?: string[];
 }
