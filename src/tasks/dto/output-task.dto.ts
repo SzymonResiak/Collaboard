@@ -1,33 +1,35 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
+import { ChecklistOutputDto } from '../../common/dto/checklist.dto';
+import { AttachmentOutputDto } from '../../common/dto/attachment.dto';
 
-export class ChecklistItemDto {
-  @Expose()
-  item: string;
+// export class ChecklistItemDto {
+//   @Expose()
+//   item: string;
 
-  @Expose()
-  isCompleted: boolean;
-}
+//   @Expose()
+//   isCompleted: boolean;
+// }
 
-export class ChecklistDto {
-  @Expose()
-  name: string;
+// export class ChecklistDto {
+//   @Expose()
+//   name: string;
 
-  @Expose()
-  @Type(() => ChecklistItemDto)
-  items: ChecklistItemDto[];
-}
+//   @Expose()
+//   @Type(() => ChecklistItemDto)
+//   items: ChecklistItemDto[];
+// }
 
-export class AttachmentDto {
-  @Expose()
-  id: string;
+// export class AttachmentDto {
+//   @Expose()
+//   id: string;
 
-  @Expose()
-  filename: string;
+//   @Expose()
+//   filename: string;
 
-  @Expose()
-  path: string;
-}
+//   @Expose()
+//   path: string;
+// }
 
 export class TaskOutputDto {
   @Expose()
@@ -60,12 +62,12 @@ export class TaskOutputDto {
   @Expose()
   @Transform(({ value }) => value || undefined)
   @ValidateNested({ each: true })
-  @Type(() => ChecklistDto)
-  checklists: ChecklistDto[];
+  @Type(() => ChecklistOutputDto)
+  checklists: ChecklistOutputDto[];
 
   @Expose()
   @Transform(({ value }) => value || undefined)
   @ValidateNested({ each: true })
-  @Type(() => AttachmentDto)
-  attachments: AttachmentDto[];
+  @Type(() => AttachmentOutputDto)
+  attachments: AttachmentOutputDto[];
 }

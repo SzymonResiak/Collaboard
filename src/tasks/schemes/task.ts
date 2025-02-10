@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { TaskStatus } from '../enums/task-status.enum';
-import { Checklist } from '../interfaces/checklist.interface';
-import { Attachment } from '../interfaces/attachment.interface';
+import { Checklist } from '../../common/interfaces/checklist.interface';
+import { Attachment } from '../../common/interfaces/attachment.interface';
 
 @Schema({ timestamps: true })
 export class Task extends Document {

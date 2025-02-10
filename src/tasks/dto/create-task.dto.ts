@@ -5,10 +5,10 @@ import {
   IsDateString,
   IsOptional,
   ValidateNested,
-  IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { ChecklistDto } from '../../common/dto/checklist.dto';
 
 export class TaskCreateDto {
   @IsNotEmpty()
@@ -47,26 +47,4 @@ export class TaskCreateDto {
   @Type(() => ChecklistDto)
   @ApiProperty()
   checklists?: ChecklistDto[];
-}
-
-export class ChecklistDto {
-  @IsString()
-  @ApiProperty()
-  name: string;
-
-  @ValidateNested({ each: true })
-  @Type(() => ChecklistItemDto)
-  @ApiProperty()
-  items: ChecklistItemDto[];
-}
-
-export class ChecklistItemDto {
-  @IsString()
-  @ApiProperty()
-  item: string;
-
-  @IsOptional()
-  @IsBoolean()
-  @ApiProperty()
-  isCompleted?: boolean = false;
 }

@@ -1,8 +1,8 @@
 import { Model, Types } from 'mongoose';
 import { Task } from './schemes/task';
 import { isDateValid } from 'src/common/utils/isDateValid';
-import { Checklist } from './interfaces/checklist.interface';
-import { Attachment } from './interfaces/attachment.interface';
+import { Checklist } from '../common/interfaces/checklist.interface';
+import { Attachment } from '../common/interfaces/attachment.interface';
 import * as crypto from 'crypto';
 
 export class TaskClass {

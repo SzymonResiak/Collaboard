@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import * as crypto from 'crypto';
 import * as sharp from 'sharp';
-import { Attachment } from 'src/tasks/interfaces/attachment.interface';
+import { Attachment } from 'src/common/interfaces/attachment.interface';
 import { ConfigService } from '@nestjs/config';
 import { Types } from 'mongoose';
 

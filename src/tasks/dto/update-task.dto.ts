@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { ChecklistDto } from './create-task.dto';
+import { ChecklistDto } from '../../common/dto/checklist.dto';
 import { Type } from 'class-transformer';
 
 export class TaskUpdateDto {
