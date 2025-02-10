@@ -3,10 +3,7 @@ import { ValidateNested } from 'class-validator';
 
 export class ChecklistItemDto {
   @Expose()
-  id: string;
-
-  @Expose()
-  text: string;
+  item: string;
 
   @Expose()
   isCompleted: boolean;

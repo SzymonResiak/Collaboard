@@ -1,9 +1,6 @@
 export interface ChecklistItem {
-  id: string;
-  text: string;
+  item: string;
   isCompleted: boolean;
-  createdAt: Date;
-  completedAt?: Date;
 }
 
 export interface Checklist {

@@ -3,11 +3,12 @@ import {
   IsOptional,
   IsMongoId,
   IsArray,
-  IsEnum,
   IsDateString,
+  ValidateNested,
 } from 'class-validator';
-import { TaskStatus } from '../enums/task-status.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ChecklistDto } from './create-task.dto';
+import { Type } from 'class-transformer';
 
 export class TaskUpdateDto {
   @IsOptional()
@@ -47,19 +48,9 @@ export class TaskUpdateDto {
   completedAt?: string;
 
   @IsOptional()
-  @IsString()
-  @ApiPropertyOptional()
-  createdBy: string;
-
-  @IsOptional()
   @IsArray()
-  @IsString({ each: true })
+  @ValidateNested({ each: true })
+  @Type(() => ChecklistDto)
   @ApiPropertyOptional()
-  checklistItems?: string[];
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  @ApiPropertyOptional()
-  attachments?: string[];
+  checklists?: ChecklistDto[];
 }

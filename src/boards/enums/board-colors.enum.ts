@@ -4,4 +4,5 @@ export enum BoardColors {
   GREEN = '#47FF47',
   YELLOW = '#FFFF47',
   RED = '#FF4747',
-}
+  LIGHT_BLUE = '#B8C9E8',
+} // update for final palette later

@@ -1,15 +1,17 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { TaskOutputDto } from 'src/tasks/dto/output-task.dto';
-import { BoardColors } from '../enums/board-colors.enum';
+// import { BoardColors } from '../enums/board-colors.enum';
 
 export class ColumnOutputDto {
   @Expose()
   name: string;
 
+  // @Expose()
+  // @Transform(({ value }) => value || BoardColors.PURPLE)
+  // color: BoardColors;
   @Expose()
-  @Transform(({ value }) => value || BoardColors.PURPLE)
-  color: BoardColors;
+  color: string;
 }
 
 export class BoardOutputDto {

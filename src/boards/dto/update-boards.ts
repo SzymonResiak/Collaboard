@@ -56,7 +56,11 @@ export class ColumnDto {
   @ApiProperty()
   name: string;
 
-  @IsEnum(BoardColors)
-  @ApiProperty({ enum: BoardColors })
-  color: BoardColors;
+  // @IsEnum(BoardColors)
+  // @ApiProperty({ enum: BoardColors })
+  // color: BoardColors;
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  color?: string;
 }

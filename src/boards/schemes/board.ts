@@ -42,9 +42,9 @@ export class Board extends Document {
       },
     ],
     default: [
-      { name: 'To Do', color: BoardColors.PURPLE },
-      { name: 'In Progress', color: BoardColors.BLUE },
-      { name: 'Done', color: BoardColors.GREEN },
+      { name: 'To Do', color: '#9AAB65' },
+      { name: 'In Progress', color: '#B8C9E8' },
+      { name: 'Done', color: '#9AAB65' },
     ],
   })
   columns: Column[];

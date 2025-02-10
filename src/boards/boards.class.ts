@@ -10,7 +10,7 @@ export class BoardClass {
   private name: string;
   private description: string;
   private type: BoardType;
-  private color: BoardColors;
+  private color: string;
   private columns: Column[];
   private admins: string[];
   private group: string;

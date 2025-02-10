@@ -33,14 +33,13 @@ export class Task extends Document {
   @Prop({
     type: [
       {
+        _id: false,
         name: { type: String, required: true },
         items: [
           {
-            id: { type: String, required: true },
-            text: { type: String, required: true },
+            _id: false,
+            item: { type: String, required: true },
             isCompleted: { type: Boolean, default: false },
-            createdAt: { type: Date, default: Date.now },
-            completedAt: { type: Date },
           },
         ],
       },

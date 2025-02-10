@@ -63,7 +63,7 @@ export class ChecklistDto {
 export class ChecklistItemDto {
   @IsString()
   @ApiProperty()
-  text: string;
+  item: string;
 
   @IsOptional()
   @IsBoolean()
