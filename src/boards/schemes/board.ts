@@ -15,7 +15,7 @@ export class Board extends Document {
   @Prop({ required: true, enum: BoardType })
   type: BoardType;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: '#9AAB65' })
   color: string;
 
   @Prop({ type: [Types.ObjectId], ref: 'User', required: true })
@@ -37,7 +37,6 @@ export class Board extends Document {
         name: { type: String, required: true },
         color: {
           type: String,
-          enum: Object.values(BoardColors),
         },
       },
     ],

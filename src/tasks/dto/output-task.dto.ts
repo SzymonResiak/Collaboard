@@ -3,34 +3,6 @@ import { ValidateNested } from 'class-validator';
 import { ChecklistOutputDto } from '../../common/dto/checklist.dto';
 import { AttachmentOutputDto } from '../../common/dto/attachment.dto';
 
-// export class ChecklistItemDto {
-//   @Expose()
-//   item: string;
-
-//   @Expose()
-//   isCompleted: boolean;
-// }
-
-// export class ChecklistDto {
-//   @Expose()
-//   name: string;
-
-//   @Expose()
-//   @Type(() => ChecklistItemDto)
-//   items: ChecklistItemDto[];
-// }
-
-// export class AttachmentDto {
-//   @Expose()
-//   id: string;
-
-//   @Expose()
-//   filename: string;
-
-//   @Expose()
-//   path: string;
-// }
-
 export class TaskOutputDto {
   @Expose()
   id: string;
@@ -52,12 +24,6 @@ export class TaskOutputDto {
 
   @Expose()
   board: string;
-
-  @Expose()
-  startedAt: Date;
-
-  @Expose()
-  completedAt: Date;
 
   @Expose()
   @Transform(({ value }) => value || undefined)

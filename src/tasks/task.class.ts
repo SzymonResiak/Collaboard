@@ -48,7 +48,6 @@ export class TaskClass {
 
   isValid(): boolean {
     if (!this.title || !this.createdBy || !this.board) return false;
-    if (!Array.isArray(this.assignees)) return false;
     if (this.dueDate && !isDateValid(this.dueDate)) return false;
 
     return true;
@@ -77,7 +76,8 @@ export class TaskClass {
     if (this.status) schema.status = this.status;
     if (this.createdBy) schema.createdBy = new Types.ObjectId(this.createdBy);
     const assignees = Array.from(new Set([...this.assignees]));
-    schema.assignees = assignees.map((item: any) => new Types.ObjectId(item));
+    schema.assignees =
+      assignees.map((item: any) => new Types.ObjectId(item)) || [];
     if (this.dueDate) schema.dueDate = this.dueDate;
     if (this.board) schema.board = new Types.ObjectId(this.board);
     if (this.completedAt) schema.completedAt = this.completedAt;
