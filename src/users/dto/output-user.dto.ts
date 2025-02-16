@@ -14,9 +14,9 @@ export class UserOutputDto {
   // @Expose()
   // email: string;
 
-  // @Expose()
-  // groups: string[];
+  @Expose()
+  groups: string[];
 
-  // @Expose()
-  // boards: string[];
+  @Expose()
+  boards: string[];
 }

@@ -45,7 +45,7 @@ export class UserClass {
   }
 
   isValid(): boolean {
-    if (!this.name || !this.login || !this.hashedPasswd || !this.login) {
+    if (!this.name || !this.login || !this.hashedPasswd) {
       return false;
     }
     return true;

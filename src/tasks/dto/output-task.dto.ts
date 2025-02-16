@@ -18,9 +18,17 @@ export class TaskOutputDto {
 
   @Expose()
   assignees: string[];
+  // TODO: refactor to: "assignees": {
+  //   "id": "string",
+  //   "name": "string",
+  //   "avatar": "png/svg"
+  // }
 
   @Expose()
   dueDate: Date;
+
+  @Expose()
+  canEdit: boolean;
 
   @Expose()
   board: string;

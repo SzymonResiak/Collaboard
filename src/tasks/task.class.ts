@@ -13,6 +13,7 @@ export class TaskClass {
   private status: string;
   private assignees: string[];
   private dueDate: Date;
+  private canEdit: boolean;
   private board: string;
   private checklists: Checklist[];
   private attachments: Attachment[];
@@ -41,6 +42,7 @@ export class TaskClass {
     if (doc.assignees) this.assignees = [...doc.assignees];
     if (doc.dueDate) this.dueDate = new Date(doc.dueDate);
     if (doc.board) this.board = doc.board;
+    if (doc.canEdit) this.canEdit = doc.canEdit;
     if (doc.completedAt) this.completedAt = new Date(doc.completedAt);
     if (doc.checklists) this.checklists = [...doc.checklists];
     if (doc.attachments) this.attachments = [...doc.attachments];

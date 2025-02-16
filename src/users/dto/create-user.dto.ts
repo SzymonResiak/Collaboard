@@ -31,5 +31,5 @@ export class UserCreateDto {
   @IsString()
   @IsEmail()
   @ApiProperty()
-  email: string;
+  email?: string;
 }

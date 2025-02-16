@@ -31,30 +31,6 @@ export class UserController {
     private readonly eventCoordinatorService: EventCoordinatorService,
   ) {}
 
-  // Removed POST /user endpoint
-  // @Version('1')
-  // @Post()
-  // @Serialize(UserOutputDto)
-  // async createUserCtrl(@Body() userDto: UserCreateDto) {
-  //   const user = await this.eventCoordinatorService.getUserByLogin(
-  //     userDto.login,
-  //   );
-  //   if (user) throw new BadRequestException('USER_NAME_EXISTS'); // move to separate error constants
-
-  //   const result = this.eventCoordinatorService.createUser(userDto);
-  //   if (!result) throw new BadRequestException('USER_CREATE_FAILED');
-  //   return result;
-  // }
-
-  // @Version('1') only for development purposes, getAllUsers can be used in services only
-  // TODO: add user #{id} where id will be 6 digit number. This will be used to fetch user that we want to add to our groups
-  // @Get('all')
-  // @Serialize(UserOutputDto)
-  // async getAllUsersCtrl() {
-  //   const users = await this.eventCoordinatorService.getAllUsers();
-  //   return users;
-  // }
-
   @Version('1')
   @Get(':id')
   @Serialize(UserOutputDto)

@@ -126,9 +126,16 @@ export class BoardController {
       board: board.id,
     });
 
+    const tasksWithEditPermission = tasks.map((task) => ({
+      ...task,
+      canEdit:
+        board.getAdmins().includes(currentUserId) ||
+        task.getAssignees().includes(currentUserId),
+    }));
+
     return {
       ...board,
-      tasks: tasks,
+      tasks: tasksWithEditPermission,
     };
   }
 
@@ -165,9 +172,17 @@ export class BoardController {
               group: '',
               board: board.id,
             });
+
+            const tasksWithEditPermission = tasks.map((task) => ({
+              ...task,
+              canEdit:
+                board.getAdmins().includes(currentUserId) ||
+                task.getAssignees().includes(currentUserId),
+            }));
+
             validBoards.push({
               ...board,
-              tasks,
+              tasks: tasksWithEditPermission,
             });
           }
         }
@@ -182,9 +197,17 @@ export class BoardController {
           group: '',
           board: board.id,
         });
+
+        const tasksWithEditPermission = tasks.map((task) => ({
+          ...task,
+          canEdit:
+            board.getAdmins().includes(currentUserId) ||
+            task.getAssignees().includes(currentUserId),
+        }));
+
         validBoards.push({
           ...board,
-          tasks,
+          tasks: tasksWithEditPermission,
         });
       }
     }
