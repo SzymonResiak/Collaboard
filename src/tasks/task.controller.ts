@@ -30,13 +30,17 @@ import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
 import { ParseFilePipe } from '@nestjs/common';
 import { MaxFileSizeValidator } from 'src/common/validators/max-file-size.validator';
 import { FileTypeValidator } from 'src/common/validators/file-type.validator';
+import { TaskGateway } from './task.gateway';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard, AuthGuard)
 @ApiBearerAuth()
 @ApiTags('tasks')
 export class TaskController {
-  constructor(private eventCoordinatorService: EventCoordinatorService) {}
+  constructor(
+    private eventCoordinatorService: EventCoordinatorService,
+    private taskGateway: TaskGateway,
+  ) {}
 
   @Version('1')
   @Post()
@@ -47,9 +51,14 @@ export class TaskController {
   ) {
     const result = await this.eventCoordinatorService.createTask({
       createdBy: user.id,
+      assignees: [user.id],
       ...createTaskDto,
     });
     if (!result) throw new BadRequestException('TASK_CREATE_FAILED');
+
+    // Emituj aktualizację tablicy po dodaniu nowego taska
+    this.taskGateway.emitTaskUpdate(result.getBoard(), result, 'CREATE');
+
     return result;
   }
 
@@ -117,6 +126,9 @@ export class TaskController {
       updates: taskDto,
     });
     if (!result) throw new BadRequestException('TASK_UPDATE_FAILED');
+
+    // Emituj aktualizację tablicy po zmianie taska
+    this.taskGateway.emitTaskUpdate(result.getBoard(), result, 'UPDATE');
 
     return result;
   }
