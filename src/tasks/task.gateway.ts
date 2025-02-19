@@ -16,7 +16,7 @@ type TaskOperation = 'CREATE' | 'UPDATE' | 'DELETE';
 
 interface TaskUpdatePayload {
   operation: TaskOperation;
-  task: any; // możesz zastąpić 'any' konkretnym interfejsem Task
+  task: any;
   boardId: string;
 }
 

@@ -10,6 +10,7 @@ import {
   Patch,
   NotFoundException,
   ForbiddenException,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
@@ -145,8 +146,8 @@ export class BoardController {
   @Serialize(BoardOutputDto)
   async getBoardsByOptions(
     @CurrentUserId() currentUserId: string,
-    @Body('ids') ids?: string[],
-    @Body('group') group?: string,
+    @Query('ids') ids?: string[],
+    @Query('group') group?: string,
   ) {
     const user = await this.eventCoordinatorService.getUserById(currentUserId);
     const options = { ids: ids ? ids : user.getBoards(), group };
