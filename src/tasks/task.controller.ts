@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { TaskCreateDto } from './dto/create-task.dto';
 import { TaskOutputDto } from './dto/output-task.dto';
@@ -19,8 +20,6 @@ import { Serialize } from '../common/interceptors/serialize.interceptor';
 import { EventCoordinatorService } from '../events/event-coordinator.service';
 import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { Types } from 'mongoose';
-import { UserClass } from 'src/users/user.class';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-guard.guard';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
 import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
@@ -30,7 +29,9 @@ import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
 import { ParseFilePipe } from '@nestjs/common';
 import { MaxFileSizeValidator } from 'src/common/validators/max-file-size.validator';
 import { FileTypeValidator } from 'src/common/validators/file-type.validator';
-import { TaskGateway } from './task.gateway';
+import { TaskGateway } from 'src/gateways/task.gateway';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { UserClass } from 'src/users/user.class';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard, AuthGuard)
@@ -44,20 +45,24 @@ export class TaskController {
 
   @Version('1')
   @Post()
-  @Serialize(TaskOutputDto)
   async createTask(
     @Body() createTaskDto: TaskCreateDto,
     @CurrentUser() user: UserClass,
+    @Req() req: Request,
   ) {
     const result = await this.eventCoordinatorService.createTask({
       createdBy: user.id,
-      assignees: [user.id],
       ...createTaskDto,
     });
     if (!result) throw new BadRequestException('TASK_CREATE_FAILED');
 
-    // Emituj aktualizację tablicy po dodaniu nowego taska
-    this.taskGateway.emitTaskUpdate(result.getBoard(), result, 'CREATE');
+    // Przekazujemy ID klienta który wykonał request
+    await this.taskGateway.emitTaskUpdate(
+      result.getBoard(),
+      result,
+      'CREATE',
+      req.headers['x-socket-id'] as string, // Frontend musi wysyłać to w headerze
+    );
 
     return result;
   }

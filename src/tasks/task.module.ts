@@ -5,7 +5,7 @@ import { TaskService } from './task.service';
 import { TaskController } from './task.controller';
 import { FileService } from '../common/services/file.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TaskGateway } from './task.gateway';
+import { TaskGateway } from '../gateways/task.gateway';
 import { JwtModule } from '@nestjs/jwt';
 import { WsJwtGuard } from '../common/guards/ws-jwt.guard';
 

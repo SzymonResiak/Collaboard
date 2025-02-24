@@ -23,6 +23,7 @@ import { BoardUpdateDto } from './dto/update-boards';
 import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
 import { BoardType } from './enums/board-type.enum';
+import { TaskClass } from 'src/tasks/task.class';
 
 @Controller('boards')
 @UseGuards(JwtAuthGuard, AuthGuard)
@@ -93,7 +94,34 @@ export class BoardController {
       }
     }
 
-    return board;
+    if (board.getType() === BoardType.PERSONAL) {
+      if (!board.getAdmins().includes(currentUserId)) {
+        throw new ForbiddenException('PERSONAL_BOARD_ACCESS_NOT_ALLOWED');
+      }
+    }
+
+    const tasks = await this.eventCoordinatorService.getTasksByOptions({
+      ids: [],
+      group: '',
+      board: board.id,
+    });
+
+    const sortedTasks = this.sortTasksByPriorityAndAssignee(
+      tasks,
+      currentUserId,
+    );
+
+    const tasksWithEditPermission = sortedTasks.map((task) => ({
+      ...task,
+      canEdit:
+        board.getAdmins().includes(currentUserId) ||
+        task.getAssignees().includes(currentUserId),
+    }));
+
+    return {
+      ...board,
+      tasks: tasksWithEditPermission,
+    };
   }
 
   @Version('1')
@@ -127,7 +155,12 @@ export class BoardController {
       board: board.id,
     });
 
-    const tasksWithEditPermission = tasks.map((task) => ({
+    const sortedTasks = this.sortTasksByPriorityAndAssignee(
+      tasks,
+      currentUserId,
+    );
+
+    const tasksWithEditPermission = sortedTasks.map((task) => ({
       ...task,
       canEdit:
         board.getAdmins().includes(currentUserId) ||
@@ -174,7 +207,12 @@ export class BoardController {
               board: board.id,
             });
 
-            const tasksWithEditPermission = tasks.map((task) => ({
+            const sortedTasks = this.sortTasksByPriorityAndAssignee(
+              tasks,
+              currentUserId,
+            );
+
+            const tasksWithEditPermission = sortedTasks.map((task) => ({
               ...task,
               canEdit:
                 board.getAdmins().includes(currentUserId) ||
@@ -199,7 +237,12 @@ export class BoardController {
           board: board.id,
         });
 
-        const tasksWithEditPermission = tasks.map((task) => ({
+        const sortedTasks = this.sortTasksByPriorityAndAssignee(
+          tasks,
+          currentUserId,
+        );
+
+        const tasksWithEditPermission = sortedTasks.map((task) => ({
           ...task,
           canEdit:
             board.getAdmins().includes(currentUserId) ||
@@ -245,4 +288,36 @@ export class BoardController {
   }
 
   //delete board DELETE(':id')
+
+  private sortTasksByPriorityAndAssignee(
+    tasks: TaskClass[],
+    currentUserId: string,
+  ) {
+    const getPriorityWeight = (priority: string) => {
+      switch (priority) {
+        case 'High':
+          return 3;
+        case 'Mid':
+          return 2;
+        case 'Low':
+          return 1;
+        default:
+          return 0;
+      }
+    };
+
+    return tasks.sort((a, b) => {
+      const aHasUser = a.getAssignees().includes(currentUserId);
+      const bHasUser = b.getAssignees().includes(currentUserId);
+
+      if (aHasUser !== bHasUser) {
+        return aHasUser ? -1 : 1;
+      }
+
+      const aPriority = getPriorityWeight(a.getPriority());
+      const bPriority = getPriorityWeight(b.getPriority());
+
+      return bPriority - aPriority;
+    });
+  }
 }

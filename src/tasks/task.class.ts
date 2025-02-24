@@ -13,6 +13,7 @@ export class TaskClass {
   private status: string;
   private assignees: string[];
   private dueDate: Date;
+  private priority: string;
   private canEdit: boolean;
   private board: string;
   private checklists: Checklist[];
@@ -38,6 +39,7 @@ export class TaskClass {
     if (doc.title) this.title = doc.title;
     if (doc.description) this.description = doc.description;
     if (doc.status) this.status = doc.status;
+    if (doc.priority) this.priority = doc.priority;
     if (doc.createdBy) this.createdBy = doc.createdBy;
     if (doc.assignees) this.assignees = [...doc.assignees];
     if (doc.dueDate) this.dueDate = new Date(doc.dueDate);
@@ -59,6 +61,7 @@ export class TaskClass {
     if (updates.title) this.title = updates.title;
     if (updates.description) this.description = updates.description;
     if (updates.status) this.status = updates.status;
+    if (updates.priority) this.priority = updates.priority;
     if (Array.isArray(updates.assignees)) {
       this.assignees = [...new Set(updates.assignees as string)];
     }
@@ -80,6 +83,7 @@ export class TaskClass {
     const assignees = Array.from(new Set([...this.assignees]));
     schema.assignees =
       assignees.map((item: any) => new Types.ObjectId(item)) || [];
+    if (this.priority) schema.priority = this.priority;
     if (this.dueDate) schema.dueDate = this.dueDate;
     if (this.board) schema.board = new Types.ObjectId(this.board);
     if (this.completedAt) schema.completedAt = this.completedAt;
@@ -103,6 +107,10 @@ export class TaskClass {
 
   getAssignees(): string[] {
     return [...this.assignees];
+  }
+
+  getPriority(): string {
+    return this.priority;
   }
 
   getCreatedBy(): string {
