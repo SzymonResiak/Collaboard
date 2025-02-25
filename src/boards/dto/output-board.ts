@@ -43,8 +43,13 @@ export class BoardOutputDto {
   @Expose()
   admins: string[];
 
+  // field for group members
   @Expose()
-  group: string;
+  members: string[];
+
+  @Expose()
+  @Transform(({ value }) => value || undefined)
+  group: GroupNameId;
 
   @Expose()
   @Transform(({ value }) => Boolean(value))
@@ -55,4 +60,9 @@ export class BoardOutputDto {
   @Type(() => TaskOutputDto)
   @Transform(({ value }) => value || [])
   tasks: TaskOutputDto[];
+}
+
+export interface GroupNameId {
+  id: string;
+  name: string;
 }

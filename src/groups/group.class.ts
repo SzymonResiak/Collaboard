@@ -81,6 +81,10 @@ export class GroupClass {
     return [...this.members];
   }
 
+  getName(): string {
+    return this.name;
+  }
+
   getAdmins(): string[] {
     return [...this.admins];
   }

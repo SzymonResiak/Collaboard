@@ -9,7 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ChecklistDto } from '../../common/dto/checklist.dto';
-
+import { TaskPriority } from '../enums/task-priority.enum';
 export class TaskCreateDto {
   @IsNotEmpty()
   @IsString()
@@ -20,6 +20,11 @@ export class TaskCreateDto {
   @IsString()
   @ApiProperty()
   status: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty()
+  priority?: TaskPriority;
 
   @IsOptional()
   @IsArray()

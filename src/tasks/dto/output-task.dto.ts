@@ -2,6 +2,8 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { ChecklistOutputDto } from '../../common/dto/checklist.dto';
 import { AttachmentOutputDto } from '../../common/dto/attachment.dto';
+import { TaskPriority } from '../enums/task-priority.enum';
+import { Assignees } from '../interfaces/assignees';
 
 export class TaskOutputDto {
   @Expose()
@@ -17,12 +19,7 @@ export class TaskOutputDto {
   status: string;
 
   @Expose()
-  assignees: string[];
-  // TODO: refactor to: "assignees": {
-  //   "id": "string",
-  //   "name": "string",
-  //   "avatar": "png/svg"
-  // }
+  assignees: Assignees[];
 
   @Expose()
   dueDate: Date;
@@ -32,6 +29,9 @@ export class TaskOutputDto {
 
   @Expose()
   board: string;
+
+  @Expose()
+  priority: TaskPriority;
 
   @Expose()
   @Transform(({ value }) => value || undefined)

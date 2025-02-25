@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { TaskStatus } from '../enums/task-status.enum';
+import { TaskPriority } from '../enums/task-priority.enum';
 import { Checklist } from '../../common/interfaces/checklist.interface';
 import { Attachment } from '../../common/interfaces/attachment.interface';
 
@@ -12,8 +12,11 @@ export class Task extends Document {
   @Prop({ trim: true })
   description?: string;
 
-  @Prop({ default: TaskStatus.TODO, index: true })
+  @Prop()
   status: string;
+
+  @Prop()
+  priority: TaskPriority;
 
   @Prop({ type: Types.ObjectId, ref: 'User', index: true })
   createdBy: Types.ObjectId;

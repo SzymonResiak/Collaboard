@@ -24,6 +24,7 @@ import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
 import { BoardType } from './enums/board-type.enum';
 import { TaskClass } from 'src/tasks/task.class';
+import { BoardClass } from './boards.class';
 
 @Controller('boards')
 @UseGuards(JwtAuthGuard, AuthGuard)
@@ -46,7 +47,6 @@ export class BoardController {
       );
       if (!group) throw new NotFoundException('GROUP_NOT_FOUND');
 
-      // update group with new board
       const result = await this.eventCoordinatorService.updateGroup({
         group,
         updates: { boards: [...group.getBoards(), boardDto.group] },
@@ -69,61 +69,6 @@ export class BoardController {
     return result;
   }
 
-  //get by id GET(':id')
-  @Version('1')
-  @Get(':id')
-  @Serialize(BoardOutputDto)
-  async getAllBoards(
-    @Param('id') id: string,
-    @CurrentUserId() currentUserId: string,
-  ) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('INVALID_BOARD_ID');
-    }
-
-    const board = await this.eventCoordinatorService.getBoardById(id);
-    if (!board) throw new NotFoundException('BOARD_NOT_FOUND');
-
-    if (board.getType() === BoardType.GROUP) {
-      const group = await this.eventCoordinatorService.getGroupById(
-        board.getGroup(),
-      );
-      if (!group) throw new NotFoundException('GROUP_NOT_FOUND');
-      if (!group.getMembers().includes(currentUserId)) {
-        throw new ForbiddenException('GROUP_ACCESS_NOT_ALLOWED');
-      }
-    }
-
-    if (board.getType() === BoardType.PERSONAL) {
-      if (!board.getAdmins().includes(currentUserId)) {
-        throw new ForbiddenException('PERSONAL_BOARD_ACCESS_NOT_ALLOWED');
-      }
-    }
-
-    const tasks = await this.eventCoordinatorService.getTasksByOptions({
-      ids: [],
-      group: '',
-      board: board.id,
-    });
-
-    const sortedTasks = this.sortTasksByPriorityAndAssignee(
-      tasks,
-      currentUserId,
-    );
-
-    const tasksWithEditPermission = sortedTasks.map((task) => ({
-      ...task,
-      canEdit:
-        board.getAdmins().includes(currentUserId) ||
-        task.getAssignees().includes(currentUserId),
-    }));
-
-    return {
-      ...board,
-      tasks: tasksWithEditPermission,
-    };
-  }
-
   @Version('1')
   @Get('name/:name')
   @Serialize(BoardOutputDto)
@@ -134,43 +79,8 @@ export class BoardController {
     const board = await this.eventCoordinatorService.getBoardByName(name);
     if (!board) throw new NotFoundException('BOARD_NOT_FOUND');
 
-    if (board.getType() === BoardType.GROUP) {
-      const group = await this.eventCoordinatorService.getGroupById(
-        board.getGroup(),
-      );
-      if (!group) throw new NotFoundException('GROUP_NOT_FOUND');
-      if (!group.getMembers().includes(currentUserId)) {
-        throw new ForbiddenException('GROUP_ACCESS_NOT_ALLOWED');
-      }
-    }
-    if (board.getType() === BoardType.PERSONAL) {
-      if (!board.getAdmins().includes(currentUserId)) {
-        throw new ForbiddenException('PERSONAL_BOARD_ACCESS_NOT_ALLOWED');
-      }
-    }
-
-    const tasks = await this.eventCoordinatorService.getTasksByOptions({
-      ids: [],
-      group: '',
-      board: board.id,
-    });
-
-    const sortedTasks = this.sortTasksByPriorityAndAssignee(
-      tasks,
-      currentUserId,
-    );
-
-    const tasksWithEditPermission = sortedTasks.map((task) => ({
-      ...task,
-      canEdit:
-        board.getAdmins().includes(currentUserId) ||
-        task.getAssignees().includes(currentUserId),
-    }));
-
-    return {
-      ...board,
-      tasks: tasksWithEditPermission,
-    };
+    await this.checkBoardAccess(board, currentUserId);
+    return this.getBoardWithTasks(board, currentUserId);
   }
 
   //get by options GET('')
@@ -193,70 +103,34 @@ export class BoardController {
 
     const validBoards = [];
     for (const board of boards) {
-      if (board.getType() === BoardType.GROUP) {
-        const groups = await this.eventCoordinatorService.getGroupsByIds([
-          board.getGroup(),
-        ]);
-        if (!groups) continue;
-
-        for (const group of groups) {
-          if (group.getMembers().includes(currentUserId)) {
-            const tasks = await this.eventCoordinatorService.getTasksByOptions({
-              ids: [],
-              group: '',
-              board: board.id,
-            });
-
-            const sortedTasks = this.sortTasksByPriorityAndAssignee(
-              tasks,
-              currentUserId,
-            );
-
-            const tasksWithEditPermission = sortedTasks.map((task) => ({
-              ...task,
-              canEdit:
-                board.getAdmins().includes(currentUserId) ||
-                task.getAssignees().includes(currentUserId),
-            }));
-
-            validBoards.push({
-              ...board,
-              tasks: tasksWithEditPermission,
-            });
-          }
-        }
-      }
-
-      if (
-        board.getType() === BoardType.PERSONAL &&
-        board.getCreatedBy() === currentUserId
-      ) {
-        const tasks = await this.eventCoordinatorService.getTasksByOptions({
-          ids: [],
-          group: '',
-          board: board.id,
-        });
-
-        const sortedTasks = this.sortTasksByPriorityAndAssignee(
-          tasks,
-          currentUserId,
-        );
-
-        const tasksWithEditPermission = sortedTasks.map((task) => ({
-          ...task,
-          canEdit:
-            board.getAdmins().includes(currentUserId) ||
-            task.getAssignees().includes(currentUserId),
-        }));
-
-        validBoards.push({
-          ...board,
-          tasks: tasksWithEditPermission,
-        });
+      try {
+        await this.checkBoardAccess(board, currentUserId);
+        validBoards.push(await this.getBoardWithTasks(board, currentUserId));
+      } catch (error) {
+        continue;
       }
     }
 
     return validBoards;
+  }
+
+  //get by id GET(':id')
+  @Version('1')
+  @Get(':id')
+  @Serialize(BoardOutputDto)
+  async getAllBoards(
+    @Param('id') id: string,
+    @CurrentUserId() currentUserId: string,
+  ) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('INVALID_BOARD_ID');
+    }
+
+    const board = await this.eventCoordinatorService.getBoardById(id);
+    if (!board) throw new NotFoundException('BOARD_NOT_FOUND');
+
+    await this.checkBoardAccess(board, currentUserId);
+    return this.getBoardWithTasks(board, currentUserId);
   }
 
   //update board PATCH(':id')
@@ -289,6 +163,77 @@ export class BoardController {
 
   //delete board DELETE(':id')
 
+  // Private methods
+
+  /**
+   * Checks if user has access to board
+   */
+  private async checkBoardAccess(
+    board: BoardClass,
+    userId: string,
+  ): Promise<void> {
+    if (board.getType() === BoardType.GROUP) {
+      const group = await this.eventCoordinatorService.getGroupById(
+        board.getGroup(),
+      );
+      if (!group) throw new NotFoundException('GROUP_NOT_FOUND');
+      if (!group.getMembers().includes(userId)) {
+        throw new ForbiddenException('GROUP_ACCESS_NOT_ALLOWED');
+      }
+    }
+
+    if (board.getType() === BoardType.PERSONAL) {
+      if (!board.getAdmins().includes(userId)) {
+        throw new ForbiddenException('PERSONAL_BOARD_ACCESS_NOT_ALLOWED');
+      }
+    }
+  }
+
+  /**
+   * Gets tasks for board and adds permissions information
+   */
+  private async getBoardWithTasks(board: BoardClass, userId: string) {
+    const tasks = await this.eventCoordinatorService.getTasksByOptions({
+      ids: [],
+      group: '',
+      board: board.id,
+    });
+
+    const sortedTasks = this.sortTasksByPriorityAndAssignee(tasks, userId);
+
+    const tasksWithEditPermission = this.addEditPermissionsToTasks(
+      sortedTasks,
+      board,
+      userId,
+    );
+
+    const boardWithMembers = await this.addMembersToBoard(board);
+
+    return {
+      ...boardWithMembers,
+      tasks: tasksWithEditPermission,
+    };
+  }
+
+  /**
+   * Adds edit permissions to tasks
+   */
+  private addEditPermissionsToTasks(
+    tasks: TaskClass[],
+    board: BoardClass,
+    userId: string,
+  ) {
+    return tasks.map((task) => ({
+      ...task,
+      canEdit:
+        board.getAdmins().includes(userId) ||
+        task.getAssignees().includes(userId),
+    }));
+  }
+
+  /**
+   * Sort tasks by priority and assignee
+   */
   private sortTasksByPriorityAndAssignee(
     tasks: TaskClass[],
     currentUserId: string,
@@ -319,5 +264,69 @@ export class BoardController {
 
       return bPriority - aPriority;
     });
+  }
+
+  /**
+   * Pobiera dane użytkowników i przekształca ich w obiekty Assignees
+   */
+  private async addMembersToBoard(board: BoardClass) {
+    const adminIds = board.getAdmins();
+    const admins = await Promise.all(
+      adminIds.map(async (adminId) => {
+        const user = await this.eventCoordinatorService.getUserById(adminId);
+        if (!user) return null;
+        return {
+          id: user.id,
+          name: user.getName(),
+          avatar: user.getAvatar ? user.getAvatar() : '',
+        };
+      }),
+    );
+
+    const validAdmins = admins.filter((admin) => admin !== null);
+    let members = [...validAdmins];
+    let groupData = null;
+
+    if (board.getType() === BoardType.GROUP && board.getGroup()) {
+      const group = await this.eventCoordinatorService.getGroupById(
+        board.getGroup(),
+      );
+      if (group) {
+        groupData = {
+          id: group.id,
+          name: group.getName(),
+        };
+
+        const memberIds = group.getMembers();
+        const nonAdminMemberIds = memberIds.filter(
+          (memberId) => !adminIds.includes(memberId),
+        );
+
+        const groupMembers = await Promise.all(
+          nonAdminMemberIds.map(async (memberId) => {
+            const user =
+              await this.eventCoordinatorService.getUserById(memberId);
+            if (!user) return null;
+            return {
+              id: user.id,
+              name: user.getName(),
+              avatar: user.getAvatar ? user.getAvatar() : '',
+            };
+          }),
+        );
+
+        const validGroupMembers = groupMembers.filter(
+          (member) => member !== null,
+        );
+        members = [...members, ...validGroupMembers];
+      }
+    }
+
+    return {
+      ...board,
+      admins: validAdmins,
+      members: members,
+      group: groupData,
+    };
   }
 }

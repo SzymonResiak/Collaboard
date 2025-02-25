@@ -11,6 +11,7 @@ export class UserClass {
   private hashedPasswd: string;
   private groups: string[];
   private boards: string[];
+  private avatar: string;
   private createdAt: Date;
   private updatedAt: Date;
   private memberCode: string;
@@ -36,6 +37,7 @@ export class UserClass {
     if (doc.login) this.login = doc.login;
     if (doc.name) this.name = doc.name;
     if (doc.email) this.email = doc.email;
+    if (doc.avatar) this.avatar = doc.avatar;
     if (doc.groups) this.groups = [...doc.groups];
     if (doc.boards) this.boards = [...doc.boards];
     if (doc.password) this.hashedPasswd = doc.password;
@@ -88,6 +90,14 @@ export class UserClass {
   // getEmail(): string { return this.email; }
   getLogin(): string {
     return this.login;
+  }
+
+  getAvatar(): string {
+    return this.avatar;
+  }
+
+  getName(): string {
+    return this.name;
   }
 
   getGroups(): string[] {
