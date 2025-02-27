@@ -121,6 +121,10 @@ export class TaskClass {
     return this.board;
   }
 
+  getStatus(): string {
+    return this.status;
+  }
+
   // Placeholder for methods to manipulate task properties
   // updateStatus(newStatus: TaskStatus): void { this.status = newStatus; }
 }

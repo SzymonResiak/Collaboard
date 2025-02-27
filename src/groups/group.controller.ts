@@ -20,6 +20,15 @@ import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { Types } from 'mongoose';
 import { AuthGuard } from 'src/common/guards/auth/auth.guard';
+import { GroupClass } from './group.class';
+import { GroupWithMembers } from './interfaces/group-with-members';
+import { Assignees } from 'src/tasks/interfaces/assignees';
+
+interface BoardStatus {
+  name: string;
+  count: number;
+  color: string;
+}
 
 @Controller('groups')
 @UseGuards(JwtAuthGuard, AuthGuard)
@@ -80,7 +89,8 @@ export class GroupController {
     if (!group.getMembers().includes(currentUserId)) {
       throw new ForbiddenException('GROUP_ACCESS_NOT_ALLOWED');
     }
-    return group;
+
+    return this.addMembersAndBoardsToGroup(group);
   }
 
   //get by options GET('')
@@ -138,4 +148,95 @@ export class GroupController {
   //delete group DELETE(':id')
 
   // privates
+
+  /**
+   * Przekształca dane grupy dodając informacje o członkach i tablicach
+   */
+  private async addMembersAndBoardsToGroup(
+    group: GroupClass,
+  ): Promise<GroupWithMembers> {
+    // Pobierz i przekształć administratorów
+    const adminIds = group.getAdmins();
+    const admins = await Promise.all(
+      adminIds.map(async (adminId) => {
+        const user = await this.eventCoordinatorService.getUserById(adminId);
+        if (!user) return null;
+        return {
+          id: user.id,
+          name: user.getName(),
+          avatar: user.getAvatar ? user.getAvatar() : '',
+        };
+      }),
+    );
+    const validAdmins = admins.filter((admin) => admin !== null) as Assignees[];
+
+    // Pobierz i przekształć członków
+    const memberIds = group.getMembers();
+    const nonAdminMemberIds = memberIds.filter(
+      (memberId) => !adminIds.includes(memberId),
+    );
+
+    const members = await Promise.all(
+      nonAdminMemberIds.map(async (memberId) => {
+        const user = await this.eventCoordinatorService.getUserById(memberId);
+        if (!user) return null;
+        return {
+          id: user.id,
+          name: user.getName(),
+          avatar: user.getAvatar ? user.getAvatar() : '',
+        };
+      }),
+    );
+    const validMembers = members.filter(
+      (member) => member !== null,
+    ) as Assignees[];
+    const allMembers = [...validAdmins, ...validMembers];
+
+    // Pobierz i przekształć tablice
+    const boardIds = group.getBoards();
+    const boards = await Promise.all(
+      boardIds.map(async (boardId) => {
+        const board = await this.eventCoordinatorService.getBoardById(boardId);
+        if (!board) return null;
+
+        // Pobierz zadania dla tablicy aby policzyć statusy
+        const tasks = await this.eventCoordinatorService.getTasksByOptions({
+          board: boardId,
+          ids: [],
+          group: '',
+        });
+
+        // Zlicz zadania według statusów
+        const statusCounts = tasks.reduce(
+          (acc, task) => {
+            const status = task.getStatus();
+            if (!acc[status]) {
+              acc[status] = {
+                name: status,
+                count: 0,
+                color: board.getColumnColor(status),
+              };
+            }
+            acc[status].count++;
+            return acc;
+          },
+          {} as Record<string, BoardStatus>,
+        );
+
+        return {
+          id: board.id,
+          name: board.getName(),
+          statuses: Object.values(statusCounts),
+        };
+      }),
+    );
+    const validBoards = boards.filter((board) => board !== null);
+
+    return {
+      ...group,
+      admins: validAdmins,
+      members: allMembers,
+      boards: validBoards,
+    } as GroupWithMembers;
+  }
 }

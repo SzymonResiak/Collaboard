@@ -1,4 +1,17 @@
 import { Expose } from 'class-transformer';
+import { Assignees } from 'src/tasks/interfaces/assignees';
+
+interface BoardStatus {
+  name: string;
+  count: number;
+  color: string;
+}
+
+interface BoardInfo {
+  id: string;
+  name: string;
+  statuses: BoardStatus[];
+}
 
 export class GroupOutputDto {
   @Expose()
@@ -11,11 +24,11 @@ export class GroupOutputDto {
   description: string;
 
   @Expose()
-  members: string[];
+  members: string[] | Assignees[];
 
   @Expose()
-  admins: string[];
+  admins: string[] | Assignees[];
 
   @Expose()
-  boards: string[];
+  boards: string[] | BoardInfo[];
 }

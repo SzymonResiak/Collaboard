@@ -119,4 +119,14 @@ export class BoardClass {
   getCreatedBy(): string {
     return this.createdBy;
   }
+
+  getColumnColor(status: string): string {
+    return (
+      this.columns.find((column) => column.name === status)?.color || '#000000'
+    );
+  }
+
+  getName(): string {
+    return this.name;
+  }
 }
